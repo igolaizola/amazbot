@@ -73,7 +73,7 @@ func Run(ctx context.Context, token, dbPath string, admin int, users []int) erro
 			bot.log(fmt.Errorf("couldn't parse key %s: %w", k, err))
 			continue
 		}
-		bot.searchs.Store(k, struct{}{})
+		bot.searchs.Store(k, nil)
 		bot.log(fmt.Sprintf("loaded from db: %s", k))
 	}
 
@@ -149,7 +149,7 @@ func Run(ctx context.Context, token, dbPath string, admin int, users []int) erro
 			if err != nil {
 				bot.message(user, err.Error())
 			} else {
-				bot.searchs.Store(parsed.id, struct{}{})
+				bot.searchs.Store(parsed.id, nil)
 			}
 			bot.message(user, fmt.Sprintf("searching %s", parsed.id))
 		}
@@ -180,11 +180,27 @@ func Run(ctx context.Context, token, dbPath string, admin int, users []int) erro
 				}
 				bot.message(user, fmt.Sprintf("searching %s", parsed.id))
 			case "status":
+				all := false
+				if args == "*" {
+					all = true
+				}
 				bot.message(user, "status info:")
-				bot.searchs.Range(func(k interface{}, _ interface{}) bool {
+				bot.searchs.Range(func(k interface{}, v interface{}) bool {
 					key := k.(string)
-					key = strings.TrimPrefix(key, userChats[user])
-					bot.message(user, fmt.Sprintf("running %s", key))
+					if !all {
+						prefix := fmt.Sprintf("%s/", userChats[user])
+						if !strings.HasPrefix(key, prefix) {
+							return true
+						}
+						key = strings.TrimPrefix(key, prefix)
+					}
+					var link string
+					var price float64
+					if i, ok := v.(api.Item); ok {
+						link = i.Link
+						price = i.Price
+					}
+					bot.messageOpts(user, fmt.Sprintf("running %s %s %.2f€", key, link, price), false)
 					return true
 				})
 				bot.log(fmt.Sprintf("elapsed: %s", bot.elapsed))
@@ -213,7 +229,7 @@ func Run(ctx context.Context, token, dbPath string, admin int, users []int) erro
 					if err != nil {
 						bot.message(user, err.Error())
 					} else {
-						bot.searchs.Store(parsed.id, struct{}{})
+						bot.searchs.Store(parsed.id, nil)
 					}
 					bot.message(user, fmt.Sprintf("searching %s", parsed.id))
 				}
@@ -251,22 +267,22 @@ func (b *bot) search(ctx context.Context, parsed parsedArgs) {
 		return
 	}
 
-	var item *api.Item
-	if err := b.db.Get("db", parsed.id, item); err != nil {
+	var item api.Item
+	if err := b.db.Get("db", parsed.id, &item); err != nil {
 		b.log(err)
 	}
-	if item == nil {
+	if item.ID == "" {
 		// store search with empty items on db
 		if err := b.db.Put("db", parsed.id, item); err != nil {
 			b.log(err)
 			return
 		}
-		if err := b.client.Search(parsed.query, item, func(api.Item) error { return nil }); err != nil {
+		if err := b.client.Search(parsed.query, &item, func(api.Item) error { return nil }); err != nil {
 			b.log(err)
 			return
 		}
 	}
-	if err := b.client.Search(parsed.query, item, func(i api.Item) error {
+	if err := b.client.Search(parsed.query, &item, func(i api.Item) error {
 		dupID := fmt.Sprintf("%s/%s/%.2f-%.2f", parsed.chat, i.ID, i.Price, i.PreviousPrice)
 		if _, ok := b.dups.Load(dupID); ok {
 			return nil
@@ -281,12 +297,13 @@ func (b *bot) search(ctx context.Context, parsed parsedArgs) {
 	}); err != nil {
 		b.log(err)
 	}
-	if item == nil {
+	if item.ID == "" {
 		return
 	}
 	if _, ok := b.searchs.Load(parsed.id); !ok {
 		return
 	}
+	b.searchs.Store(parsed.id, item)
 	if err := b.db.Put("db", parsed.id, item); err != nil {
 		b.log(err)
 		return
@@ -328,7 +345,7 @@ func (b *bot) export(user int) {
 	b.message(user, fmt.Sprintf("/batch %s", strings.Join(keys, "\n")))
 }
 
-func (b *bot) message(chat interface{}, text string) {
+func (b *bot) messageOpts(chat interface{}, text string, preview bool) {
 	var msg tgbot.MessageConfig
 	switch v := chat.(type) {
 	case string:
@@ -340,10 +357,15 @@ func (b *bot) message(chat interface{}, text string) {
 	default:
 		b.log(fmt.Sprintf("invalid type for message: %T", chat))
 	}
+	msg.DisableWebPagePreview = true
 	if _, err := b.Send(msg); err != nil {
 		b.log(fmt.Errorf("couldn't send message to %v: %w", chat, err))
 	}
 	<-time.After(100 * time.Millisecond)
+}
+
+func (b *bot) message(chat interface{}, text string) {
+	b.messageOpts(chat, text, true)
 }
 
 func (b *bot) printChatID(msg *tgbot.Message) {

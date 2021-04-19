@@ -91,6 +91,9 @@ func (c *Client) Search(id string, item *Item, callback func(Item) error) error 
 var errBadGateway = errors.New("api: 502 bad gateway")
 
 func (c *Client) search(id string, item *Item, callback func(Item) error) error {
+	if item == nil {
+		return fmt.Errorf("api: item is nil")
+	}
 	u := fmt.Sprintf("https://www.amazon.es/dp/%s", id)
 	r, err := c.client.Get(u)
 	if err != nil {
@@ -145,18 +148,16 @@ func (c *Client) search(id string, item *Item, callback func(Item) error) error 
 		return fmt.Errorf("api: link not found: %s", id)
 	}
 
-	if item == nil {
-		item = &Item{
-			PreviousPrice: -1,
-			CreatedAt:     time.Now().UTC(),
-		}
-	} else {
-		item.PreviousPrice = item.Price
-	}
 	item.ID = id
 	item.Link = link
 	item.Title = title
 	item.Price = price
+	if item.ID == "" {
+		item.PreviousPrice = -1
+		item.CreatedAt = time.Now().UTC()
+	} else {
+		item.PreviousPrice = item.Price
+	}
 	if item.Price < item.PreviousPrice {
 		if err := callback(*item); err != nil {
 			return err
