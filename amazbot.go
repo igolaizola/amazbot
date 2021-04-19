@@ -158,6 +158,10 @@ func Run(ctx context.Context, token, dbPath string, admin int, users []int) erro
 			args := update.Message.CommandArguments()
 			switch update.Message.Command() {
 			case "chat":
+				if args == "" {
+					bot.message(user, fmt.Sprintf("current chat id for searchs: %s", userChats[user]))
+					break
+				}
 				userChats[user] = args
 				if err := db.Put("config", strconv.Itoa(user), args); err != nil {
 					bot.log(fmt.Errorf("couldn't get config for %d: %w", u, err))
@@ -178,7 +182,9 @@ func Run(ctx context.Context, token, dbPath string, admin int, users []int) erro
 			case "status":
 				bot.message(user, "status info:")
 				bot.searchs.Range(func(k interface{}, _ interface{}) bool {
-					bot.message(user, fmt.Sprintf("running %s", k.(string)))
+					key := k.(string)
+					key = strings.TrimPrefix(key, userChats[user])
+					bot.message(user, fmt.Sprintf("running %s", key))
 					return true
 				})
 				bot.log(fmt.Sprintf("elapsed: %s", bot.elapsed))
