@@ -151,14 +151,14 @@ func (c *Client) search(id string, item *Item, callback func(Item) error) error 
 	item.ID = id
 	item.Link = link
 	item.Title = title
-	item.Price = price
 	if item.ID == "" {
+		item.Price = price
 		item.PreviousPrice = -1
 		item.CreatedAt = time.Now().UTC()
-	} else {
-		item.PreviousPrice = item.Price
 	}
-	if item.Price < item.PreviousPrice {
+	if item.Price < price {
+		item.PreviousPrice = item.Price
+		item.Price = price
 		if err := callback(*item); err != nil {
 			return err
 		}
