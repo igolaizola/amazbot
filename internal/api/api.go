@@ -50,6 +50,15 @@ func New(ctx context.Context) (*Client, error) {
 }
 
 func ItemID(link string) (string, bool) {
+	// Isolate link
+	idx := strings.Index(link, "http")
+	if idx < 0 {
+		return "", false
+	}
+	link = link[idx:]
+	link = strings.Split(link, " ")[0]
+
+	// Parse url and get product id
 	u, err := url.Parse(link)
 	if err != nil {
 		return "", false
