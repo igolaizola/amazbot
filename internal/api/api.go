@@ -125,7 +125,8 @@ func (c *Client) search(id string, item *Item, callback func(Item) error) error 
 	if sel == nil {
 		return nil
 	}
-	text := strings.Replace(sel.Text(), ",", ".", 1)
+	text := strings.Replace(sel.Text(), ".", "", -1)
+	text = strings.Replace(text, ",", ".", 1)
 	i := strings.Index(text, ".")
 	if i < 0 {
 		html, _ := doc.Html()
