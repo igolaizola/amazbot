@@ -39,10 +39,14 @@ func Run(ctx context.Context, token, dbPath string, admin int, users []int) erro
 	}
 	botAPI.Debug = true
 
+	apiCli, err := api.New(ctx)
+	if err != nil {
+		return fmt.Errorf("couldn't create api client: %w", err)
+	}
 	bot := &bot{
 		BotAPI: botAPI,
 		db:     db,
-		client: api.New(ctx),
+		client: apiCli,
 		admin:  admin,
 	}
 
@@ -296,6 +300,13 @@ func (b *bot) search(ctx context.Context, parsed parsedArgs) {
 		return nil
 	}); err != nil {
 		b.log(err)
+		// restart api client on error
+		apiCli, err := api.New(ctx)
+		if err != nil {
+			b.log(fmt.Errorf("couldn't create api client: %w", err))
+		} else {
+			b.client = apiCli
+		}
 	}
 	if item.ID == "" {
 		return

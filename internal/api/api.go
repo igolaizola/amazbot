@@ -30,11 +30,10 @@ type Client struct {
 	ctx    context.Context
 }
 
-func New(ctx context.Context) *Client {
+func New(ctx context.Context) (*Client, error) {
 	cookieJar, err := cookiejar.New(nil)
 	if err != nil {
-		panic("could not create cookie jar")
-		//return nil, fmt.Errorf("could not create cookie jar: %w", err)
+		return nil, fmt.Errorf("api: could not create cookie jar: %w", err)
 	}
 	cli := &Client{
 		ctx: ctx,
@@ -47,7 +46,7 @@ func New(ctx context.Context) *Client {
 		},
 	}
 	cli.client.Get("https://www.amazon.es")
-	return cli
+	return cli, nil
 }
 
 func ItemID(link string) (string, bool) {
@@ -120,7 +119,8 @@ func (c *Client) search(id string, item *Item, callback func(Item) error) error 
 	text := strings.Replace(sel.Text(), ",", ".", 1)
 	i := strings.Index(text, ".")
 	if i < 0 {
-		return fmt.Errorf("api: price point not found: %s %s", id, text)
+		html, _ := doc.Html()
+		return fmt.Errorf("api: price point not found: %s %s %s", id, text, html)
 	}
 	text = fmt.Sprintf("%s.%s", text[0:i], text[i+1:i+3])
 	price, err := strconv.ParseFloat(text, 32)
@@ -172,20 +172,26 @@ type transport struct {
 }
 
 func (t *transport) RoundTrip(r *http.Request) (*http.Response, error) {
-	r.Header.Set("Origin", "https://www.amazon.es")
-	r.Header.Set("Referer", "https://www.amazon.es")
-	r.Header.Set("Sec-Fetch-Dest", "empty")
-	r.Header.Set("Sec-Fetch-Site", "same-origin")
-	r.Header.Set("Sec-Fetch-User", "?F")
-	r.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36")
-	r.Header.Add("Content-Type", "application/json")
-	r.Header.Add("cache-control", "no-cache")
+	r.Header.Set("cache-control", "max-age=0")
+	r.Header.Set("rtt", "150")
+	r.Header.Set("downlink", "10")
+	r.Header.Set("ect", "4g")
+	r.Header.Set("sec-ch-ua", `"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"`)
+	r.Header.Set("sec-ch-ua-mobile", "?0")
+	r.Header.Set("upgrade-insecure-requests", "1")
+	r.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36")
+	r.Header.Set("accept", "ext/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+	r.Header.Set("sec-fetch-site", "none")
+	r.Header.Set("sec-fetch-mode", "navigate")
+	r.Header.Set("sec-fetch-user", "?1")
+	r.Header.Set("sec-fetch-dest", "document")
+	r.Header.Set("accept-language", "es-ES,es;q=0.9,en-US;q=0.8,en;q=0.7,eu;q=0.6,fr;q=0.5")
 
 	t.lock.Lock()
 	defer func() {
 		select {
 		case <-t.ctx.Done():
-		case <-time.After(1000 * time.Millisecond):
+		case <-time.After(5000 * time.Millisecond):
 		}
 		t.lock.Unlock()
 	}()
