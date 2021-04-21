@@ -200,11 +200,15 @@ func Run(ctx context.Context, token, dbPath string, admin int, users []int) erro
 					}
 					var link string
 					var price float64
+					var usedPrice string
 					if i, ok := v.(api.Item); ok {
 						link = i.Link
 						price = i.Price
+						if i.UsedPrice > 0 {
+							usedPrice = fmt.Sprintf(" %.2f€", i.UsedPrice)
+						}
 					}
-					bot.messageOpts(user, fmt.Sprintf("running %s %s %.2f€", key, link, price), false)
+					bot.messageOpts(user, fmt.Sprintf("running %s %s %.2f€%s", key, link, price, usedPrice), false)
 					return true
 				})
 				bot.log(fmt.Sprintf("elapsed: %s", bot.elapsed))
@@ -287,16 +291,11 @@ func (b *bot) search(ctx context.Context, parsed parsedArgs) {
 		}
 	}
 	if err := b.client.Search(parsed.query, &item, func(i api.Item) error {
-		dupID := fmt.Sprintf("%s/%s/%.2f-%.2f", parsed.chat, i.ID, i.Price, i.PreviousPrice)
-		if _, ok := b.dups.Load(dupID); ok {
-			return nil
-		}
-		text := newAdMessage(i, parsed.chat)
+		text := priceUsedMessage(i, parsed.chat)
 		if i.PreviousPrice > i.Price {
 			text = priceDownMessage(i, parsed.chat)
 		}
 		b.message(parsed.chat, text)
-		b.dups.Store(dupID, struct{}{})
 		return nil
 	}); err != nil {
 		b.log(err)
@@ -409,15 +408,6 @@ func (b *bot) log(obj interface{}) {
 	<-time.After(100 * time.Millisecond)
 }
 
-func newAdMessage(i api.Item, chat string) string {
-	bottom := ""
-	if strings.HasPrefix(chat, "@") {
-		bottom = fmt.Sprintf("\n\n📣 Más anuncios en %s", chat)
-	}
-	return fmt.Sprintf("‼️ NUEVO ANUNCIO\n\n%s\n\n✅ Precio: %.2f€\n\n🔗 %s%s",
-		i.Title, i.Price, i.Link, bottom)
-}
-
 func priceDownMessage(i api.Item, chat string) string {
 	bottom := ""
 	if strings.HasPrefix(chat, "@") {
@@ -425,4 +415,13 @@ func priceDownMessage(i api.Item, chat string) string {
 	}
 	return fmt.Sprintf("⚡️ BAJADA DE PRECIO\n\n%s\n\n✅ Precio: %.2f€\n🚫 Anterior: %.2f€\n\n🔗 %s%s",
 		i.Title, i.Price, i.PreviousPrice, i.Link, bottom)
+}
+
+func priceUsedMessage(i api.Item, chat string) string {
+	bottom := ""
+	if strings.HasPrefix(chat, "@") {
+		bottom = fmt.Sprintf("\n\n📣 Más anuncios en %s", chat)
+	}
+	return fmt.Sprintf("♻️ REACONDICIONADO\n\n%s\n\n✅ Precio: %.2f€\n🚫 Nuevo: %.2f€\n\n🔗 %s%s",
+		i.Title, i.UsedPrice, i.Price, i.Link, bottom)
 }

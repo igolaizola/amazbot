@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
@@ -17,12 +18,14 @@ import (
 )
 
 type Item struct {
-	ID            string    `json:"id"`
-	Link          string    `json:"link"`
-	Title         string    `json:"title"`
-	Price         float64   `json:"price"`
-	PreviousPrice float64   `json:"previous_price"`
-	CreatedAt     time.Time `json:"created_at"`
+	ID                string    `json:"id"`
+	Link              string    `json:"link"`
+	Title             string    `json:"title"`
+	Price             float64   `json:"price"`
+	PreviousPrice     float64   `json:"previous_price"`
+	UsedPrice         float64   `json:"used_price"`
+	PreviousUsedPrice float64   `json:"previous_used_price"`
+	CreatedAt         time.Time `json:"created_at"`
 }
 
 type Client struct {
@@ -120,42 +123,68 @@ func (c *Client) search(id string, item *Item, callback func(Item) error) error 
 		return err
 	}
 
-	// search price
-	sel := doc.Find("#priceblock_ourprice").First()
-	if sel == nil {
-		return nil
-	}
-	text := strings.Replace(sel.Text(), ".", "", -1)
-	text = strings.Replace(text, ",", ".", 1)
-	i := strings.Index(text, ".")
-	if i < 0 {
-		html, _ := doc.Html()
-		return fmt.Errorf("api: price point not found: %s %s %s", id, text, html)
-	}
-	text = fmt.Sprintf("%s.%s", text[0:i], text[i+1:i+3])
-	price, err := strconv.ParseFloat(text, 32)
-	if err != nil {
-		return fmt.Errorf("api: invalid price value: %s: %w", text, err)
+	// search captcha
+	captcha := false
+	doc.Find("#captchacharacters").EachWithBreak(func(i int, s *goquery.Selection) bool {
+		captcha = true
+		return false
+	})
+	if captcha {
+		return fmt.Errorf("api: captcha validation required: %s", id)
 	}
 
 	// search title
-	sel = doc.Find("#productTitle").First()
-	if sel == nil {
-		return nil
+	var title string
+	doc.Find("#productTitle").EachWithBreak(func(i int, s *goquery.Selection) bool {
+		title = strings.TrimSpace(s.Text())
+		return false
+	})
+	if title == "" {
+		h, _ := doc.Html()
+		ioutil.WriteFile("err.html", []byte(h), 0644)
+		return fmt.Errorf("api: title not found: %s", id)
 	}
-	title := strings.Trim(sel.Text(), "\n")
 
 	// search link
 	var link string
-	doc.Find("link").Each(func(i int, s *goquery.Selection) {
+	doc.Find("link").EachWithBreak(func(i int, s *goquery.Selection) bool {
 		rel, _ := s.Attr("rel")
 		if rel != "canonical" {
-			return
+			return true
 		}
 		link, _ = s.Attr("href")
+		return false
 	})
 	if link == "" {
 		return fmt.Errorf("api: link not found: %s", id)
+	}
+
+	// search price new
+	var new string
+	doc.Find("#priceblock_ourprice").EachWithBreak(func(i int, s *goquery.Selection) bool {
+		new = s.Text()
+		return false
+	})
+	if new == "" {
+		return fmt.Errorf("api: price not found: %s", id)
+	}
+	price, err := parsePrice(new)
+	if err != nil {
+		return fmt.Errorf("api: couldn't parse new price: %s: %w", id, err)
+	}
+
+	// search price used
+	var used string
+	doc.Find("#olpLinkWidget_feature_div span.a-size-base.a-color-base").EachWithBreak(func(i int, s *goquery.Selection) bool {
+		used = s.Text()
+		return false
+	})
+	var usedPrice float64
+	if used != "" {
+		usedPrice, err = parsePrice(used)
+		if err != nil {
+			return fmt.Errorf("api: couldn't parse used price: %s: %w", id, err)
+		}
 	}
 
 	item.ID = id
@@ -163,9 +192,14 @@ func (c *Client) search(id string, item *Item, callback func(Item) error) error 
 	item.Title = title
 	if item.ID == "" {
 		item.Price = price
-		item.PreviousPrice = -1
+		item.PreviousUsedPrice = 0
+		item.UsedPrice = usedPrice
+		item.PreviousPrice = 0
 		item.CreatedAt = time.Now().UTC()
 	}
+	item.PreviousUsedPrice = item.UsedPrice
+	item.UsedPrice = usedPrice
+
 	if item.Price < price {
 		item.PreviousPrice = item.Price
 		item.Price = price
@@ -173,7 +207,27 @@ func (c *Client) search(id string, item *Item, callback func(Item) error) error 
 			return err
 		}
 	}
+	if item.UsedPrice > 0 {
+		if item.PreviousPrice <= 0 || item.UsedPrice < item.PreviousUsedPrice {
+			if err := callback(*item); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
+}
+
+func parsePrice(text string) (float64, error) {
+	text = strings.TrimSpace(text)
+	text = strings.Trim(text, "€$")
+	text = strings.TrimSpace(text)
+	text = strings.Replace(text, ".", "", -1)
+	text = strings.Replace(text, ",", ".", 1)
+	price, err := strconv.ParseFloat(text, 32)
+	if err != nil {
+		return 0, err
+	}
+	return price, nil
 }
 
 type transport struct {
