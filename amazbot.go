@@ -3,6 +3,7 @@ package amazbot
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"sort"
 	"strconv"
@@ -26,7 +27,18 @@ type bot struct {
 	elapsed time.Duration
 }
 
-func Run(ctx context.Context, token, dbPath string, admin int, users []int) error {
+var captcha = `from amazoncaptcha import AmazonCaptcha
+import sys
+
+link = sys.argv[1]
+captcha = AmazonCaptcha.fromlink(link)
+solution = captcha.solve()
+print(solution)
+`
+
+func Run(ctx context.Context, python, token, dbPath string, admin int, users []int) error {
+	err := ioutil.WriteFile("captcha.py", []byte(captcha), 0644)
+
 	db, err := store.New(dbPath)
 	if err != nil {
 		log.Fatal(err)
@@ -37,9 +49,9 @@ func Run(ctx context.Context, token, dbPath string, admin int, users []int) erro
 	if err != nil {
 		return fmt.Errorf("couldn't create bot api: %w", err)
 	}
-	botAPI.Debug = true
+	//botAPI.Debug = true
 
-	apiCli, err := api.New(ctx)
+	apiCli, err := api.New(ctx, python)
 	if err != nil {
 		return fmt.Errorf("couldn't create api client: %w", err)
 	}
@@ -299,13 +311,6 @@ func (b *bot) search(ctx context.Context, parsed parsedArgs) {
 		return nil
 	}); err != nil {
 		b.log(err)
-		// restart api client on error
-		apiCli, err := api.New(ctx)
-		if err != nil {
-			b.log(fmt.Errorf("couldn't create api client: %w", err))
-		} else {
-			b.client = apiCli
-		}
 	}
 	if item.ID == "" {
 		return

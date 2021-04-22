@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"os/exec"
 	"strconv"
 	"strings"
 	"sync"
@@ -31,9 +32,10 @@ type Item struct {
 type Client struct {
 	client *http.Client
 	ctx    context.Context
+	python string
 }
 
-func New(ctx context.Context) (*Client, error) {
+func New(ctx context.Context, python string) (*Client, error) {
 	cookieJar, err := cookiejar.New(nil)
 	if err != nil {
 		return nil, fmt.Errorf("api: could not create cookie jar: %w", err)
@@ -47,6 +49,7 @@ func New(ctx context.Context) (*Client, error) {
 			},
 			Jar: cookieJar,
 		},
+		python: python,
 	}
 	cli.client.Get("https://www.amazon.es")
 	return cli, nil
@@ -102,10 +105,14 @@ func (c *Client) Search(id string, item *Item, callback func(Item) error) error 
 var errBadGateway = errors.New("api: 502 bad gateway")
 
 func (c *Client) search(id string, item *Item, callback func(Item) error) error {
+	u := fmt.Sprintf("https://www.amazon.es/dp/%s", id)
+	return c.searchURL(u, id, item, callback)
+}
+
+func (c *Client) searchURL(u string, id string, item *Item, callback func(Item) error) error {
 	if item == nil {
 		return fmt.Errorf("api: item is nil")
 	}
-	u := fmt.Sprintf("https://www.amazon.es/dp/%s", id)
 	r, err := c.client.Get(u)
 	if err != nil {
 		return fmt.Errorf("api: get request failed: %w", err)
@@ -130,7 +137,62 @@ func (c *Client) search(id string, item *Item, callback func(Item) error) error 
 		return false
 	})
 	if captcha {
-		return fmt.Errorf("api: captcha validation required: %s", id)
+		var img string
+		doc.Find("form img").EachWithBreak(func(i int, s *goquery.Selection) bool {
+			if v, ok := s.Attr("src"); ok {
+				img = v
+				return false
+			}
+			return true
+		})
+		if img == "" {
+			return fmt.Errorf("api: couldn't get captcha image: %s", id)
+		}
+		var amzn string
+		var amznr string
+		doc.Find("form input").Each(func(i int, s *goquery.Selection) {
+			val, ok := s.Attr("value")
+			if !ok {
+				return
+			}
+			name, ok := s.Attr("name")
+			if !ok {
+				return
+			}
+			switch name {
+			case "amzn":
+				amzn = val
+			case "amzn-r":
+				amznr = val
+			}
+		})
+		if amzn == "" {
+			return fmt.Errorf("api: couldn't get amzn value: %s", id)
+		}
+		if amznr == "" {
+			return fmt.Errorf("api: couldn't get amzn-r value: %s", id)
+		}
+
+		// resolve captcha
+		out, err := exec.Command(c.python, "captcha.py", img).Output()
+		if err != nil {
+			return fmt.Errorf("api: captcha command failed: %s %w", out, err)
+		}
+		solution := strings.TrimSpace(string(out))
+		if solution == "" {
+			return fmt.Errorf("api: solved captcha is empty")
+		}
+
+		u, err := url.Parse("https://www.amazon.es/errors/validateCaptcha")
+		if err != nil {
+			return fmt.Errorf("api: couldn't parse url: %w", err)
+		}
+		q := u.Query()
+		q.Set("amzn", amzn)
+		q.Set("amzn-r", amznr)
+		q.Set("field-keywords", solution)
+		u.RawQuery = q.Encode()
+		return c.searchURL(u.String(), id, item, callback)
 	}
 
 	// search title

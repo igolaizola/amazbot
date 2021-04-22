@@ -16,6 +16,7 @@ func main() {
 	// Parse flags
 	token := flag.String("token", "", "telegram bot token")
 	db := flag.String("db", "amazbot.db", "database file path")
+	python := flag.String("python", "python", "python command")
 	admin := flag.Int("admin", 0, "admin chat id that controls the bot")
 	var users arrayFlags
 	flag.Var(&users, "user", "user chat id allowed to control the bot")
@@ -46,7 +47,7 @@ func main() {
 	}()
 
 	// Run bot
-	if err := amazbot.Run(ctx, *token, *db, *admin, users); err != nil {
+	if err := amazbot.Run(ctx, *python, *token, *db, *admin, users); err != nil {
 		log.Fatal(err)
 	}
 }
