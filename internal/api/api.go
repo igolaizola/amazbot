@@ -269,8 +269,8 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item) 
 			return err
 		}
 	}
-	if item.UsedPrice > 0 {
-		if item.PreviousPrice <= 0 || item.UsedPrice < item.PreviousUsedPrice {
+	if item.UsedPrice > 0 && item.UsedPrice < item.Price {
+		if item.PreviousUsedPrice <= 0 || item.UsedPrice < item.PreviousUsedPrice {
 			if err := callback(*item); err != nil {
 				return err
 			}
