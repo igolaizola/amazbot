@@ -262,7 +262,7 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item) 
 	item.PreviousUsedPrice = item.UsedPrice
 	item.UsedPrice = usedPrice
 
-	if item.Price < price {
+	if price < item.Price {
 		item.PreviousPrice = item.Price
 		item.Price = price
 		if err := callback(*item); err != nil {
