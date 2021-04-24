@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"os/exec"
 	"strconv"
 	"strings"
 	"sync"
@@ -30,15 +30,22 @@ type Item struct {
 }
 
 type Client struct {
-	client *http.Client
-	ctx    context.Context
-	python string
+	client     *http.Client
+	ctx        context.Context
+	captchaURL string
 }
 
-func New(ctx context.Context, python string) (*Client, error) {
+func New(ctx context.Context, captchaURL string) (*Client, error) {
 	cookieJar, err := cookiejar.New(nil)
 	if err != nil {
 		return nil, fmt.Errorf("api: could not create cookie jar: %w", err)
+	}
+	captchaURL = strings.TrimLeft(captchaURL, "/")
+	if captchaURL != "" {
+		_, err = url.Parse(captchaURL)
+		if err != nil {
+			return nil, fmt.Errorf("api: couldn't parse captcha service url %s: %w", captchaURL, err)
+		}
 	}
 	cli := &Client{
 		ctx: ctx,
@@ -49,7 +56,19 @@ func New(ctx context.Context, python string) (*Client, error) {
 			},
 			Jar: cookieJar,
 		},
-		python: python,
+		captchaURL: captchaURL,
+	}
+	// test captcha resolver
+	if captchaURL != "" {
+		c, err := cli.resolveCaptcha("https://images-na.ssl-images-amazon.com/captcha/usvmgloq/Captcha_kwrrnqwkph.jpg")
+		switch {
+		case err != nil:
+			log.Println(err)
+		case c != "AAFXMX":
+			log.Println(fmt.Errorf("api: captcha resolver failed: %s", c))
+		default:
+			log.Println("api: captcha resolver test succeeded")
+		}
 	}
 	cli.client.Get("https://www.amazon.es")
 	return cli, nil
@@ -83,7 +102,7 @@ func ItemID(link string) (string, bool) {
 	return "", false
 }
 
-func (c *Client) Search(id string, item *Item, callback func(Item) error) error {
+func (c *Client) Search(id string, item *Item, callback func(Item, bool) error) error {
 	for {
 		select {
 		case <-c.ctx.Done():
@@ -104,12 +123,12 @@ func (c *Client) Search(id string, item *Item, callback func(Item) error) error 
 
 var errBadGateway = errors.New("api: 502 bad gateway")
 
-func (c *Client) search(id string, item *Item, callback func(Item) error) error {
+func (c *Client) search(id string, item *Item, callback func(Item, bool) error) error {
 	u := fmt.Sprintf("https://www.amazon.es/dp/%s", id)
 	return c.searchURL(u, id, item, callback)
 }
 
-func (c *Client) searchURL(u string, id string, item *Item, callback func(Item) error) error {
+func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, bool) error) error {
 	if item == nil {
 		return fmt.Errorf("api: item is nil")
 	}
@@ -174,13 +193,9 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item) 
 		}
 
 		// resolve captcha
-		out, err := exec.Command(c.python, "captcha.py", img).Output()
+		solution, err := c.resolveCaptcha(img)
 		if err != nil {
-			return fmt.Errorf("api: captcha command failed: %s %w", out, err)
-		}
-		solution := strings.TrimSpace(string(out))
-		if solution == "" {
-			return fmt.Errorf("api: solved captcha is empty")
+			return err
 		}
 
 		u, err := url.Parse("https://www.amazon.es/errors/validateCaptcha")
@@ -227,12 +242,12 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item) 
 		new = s.Text()
 		return false
 	})
-	if new == "" {
-		return fmt.Errorf("api: price not found: %s", id)
-	}
-	price, err := parsePrice(new)
-	if err != nil {
-		return fmt.Errorf("api: couldn't parse new price: %s: %w", id, err)
+	var price float64
+	if new != "" {
+		price, err = parsePrice(new)
+		if err != nil {
+			return fmt.Errorf("api: couldn't parse new price: %s: %w", id, err)
+		}
 	}
 
 	// search price used
@@ -249,6 +264,10 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item) 
 		}
 	}
 
+	if new == "" && used == "" {
+		return fmt.Errorf("api: price not found: %s", id)
+	}
+
 	if item.ID == "" {
 		item.Price = price
 		item.UsedPrice = usedPrice
@@ -260,22 +279,48 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item) 
 	item.Title = title
 	item.PreviousUsedPrice = item.UsedPrice
 	item.UsedPrice = usedPrice
-
+	if item.Price <= 0 {
+		item.Price = price
+	}
 	if price < item.Price {
 		item.PreviousPrice = item.Price
 		item.Price = price
-		if err := callback(*item); err != nil {
+		if err := callback(*item, true); err != nil {
 			return err
 		}
 	}
 	if item.UsedPrice > 0 && item.UsedPrice < item.Price {
 		if item.PreviousUsedPrice <= 0 || item.UsedPrice < item.PreviousUsedPrice {
-			if err := callback(*item); err != nil {
+			if err := callback(*item, false); err != nil {
 				return err
 			}
 		}
 	}
 	return nil
+}
+
+func (c *Client) resolveCaptcha(link string) (string, error) {
+	if c.captchaURL == "" {
+		return "", errors.New("api:missing captcha service")
+	}
+	u := fmt.Sprintf("%s/%s", c.captchaURL, link)
+	r, err := c.client.Get(u)
+	if err != nil {
+		return "", fmt.Errorf("api: get request failed: %w", err)
+	}
+	if r.StatusCode != 200 {
+		return "", fmt.Errorf("api: invalid status code: %s", r.Status)
+	}
+	defer r.Body.Close()
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return "", fmt.Errorf("api: error reading body: %w", err)
+	}
+	captcha := string(body)
+	if captcha == "" {
+		return "", fmt.Errorf("api: resolved captcha is empty")
+	}
+	return captcha, nil
 }
 
 func parsePrice(text string) (float64, error) {

@@ -3,7 +3,6 @@ package amazbot
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"sort"
 	"strconv"
@@ -27,18 +26,7 @@ type bot struct {
 	elapsed time.Duration
 }
 
-var captcha = `from amazoncaptcha import AmazonCaptcha
-import sys
-
-link = sys.argv[1]
-captcha = AmazonCaptcha.fromlink(link)
-solution = captcha.solve()
-print(solution)
-`
-
-func Run(ctx context.Context, python, token, dbPath string, admin int, users []int) error {
-	err := ioutil.WriteFile("captcha.py", []byte(captcha), 0644)
-
+func Run(ctx context.Context, captchaURL, token, dbPath string, admin int, users []int) error {
 	db, err := store.New(dbPath)
 	if err != nil {
 		log.Fatal(err)
@@ -51,7 +39,7 @@ func Run(ctx context.Context, python, token, dbPath string, admin int, users []i
 	}
 	//botAPI.Debug = true
 
-	apiCli, err := api.New(ctx, python)
+	apiCli, err := api.New(ctx, captchaURL)
 	if err != nil {
 		return fmt.Errorf("couldn't create api client: %w", err)
 	}
@@ -297,14 +285,14 @@ func (b *bot) search(ctx context.Context, parsed parsedArgs) {
 			b.log(err)
 			return
 		}
-		if err := b.client.Search(parsed.query, &item, func(api.Item) error { return nil }); err != nil {
+		if err := b.client.Search(parsed.query, &item, func(api.Item, bool) error { return nil }); err != nil {
 			b.log(err)
 			return
 		}
 	}
-	if err := b.client.Search(parsed.query, &item, func(i api.Item) error {
+	if err := b.client.Search(parsed.query, &item, func(i api.Item, new bool) error {
 		text := priceUsedMessage(i, parsed.chat)
-		if i.PreviousPrice > i.Price {
+		if new {
 			text = priceDownMessage(i, parsed.chat)
 		}
 		b.message(parsed.chat, text)
