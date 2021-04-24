@@ -297,14 +297,14 @@ func (b *bot) search(ctx context.Context, parsed parsedArgs) {
 			b.log(err)
 			return
 		}
-		if err := b.client.Search(parsed.query, &item, func(api.Item) error { return nil }); err != nil {
+		if err := b.client.Search(parsed.query, &item, func(api.Item, bool) error { return nil }); err != nil {
 			b.log(err)
 			return
 		}
 	}
-	if err := b.client.Search(parsed.query, &item, func(i api.Item) error {
+	if err := b.client.Search(parsed.query, &item, func(i api.Item, new bool) error {
 		text := priceUsedMessage(i, parsed.chat)
-		if i.PreviousPrice > i.Price {
+		if new {
 			text = priceDownMessage(i, parsed.chat)
 		}
 		b.message(parsed.chat, text)

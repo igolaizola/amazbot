@@ -83,7 +83,7 @@ func ItemID(link string) (string, bool) {
 	return "", false
 }
 
-func (c *Client) Search(id string, item *Item, callback func(Item) error) error {
+func (c *Client) Search(id string, item *Item, callback func(Item, bool) error) error {
 	for {
 		select {
 		case <-c.ctx.Done():
@@ -104,12 +104,12 @@ func (c *Client) Search(id string, item *Item, callback func(Item) error) error 
 
 var errBadGateway = errors.New("api: 502 bad gateway")
 
-func (c *Client) search(id string, item *Item, callback func(Item) error) error {
+func (c *Client) search(id string, item *Item, callback func(Item, bool) error) error {
 	u := fmt.Sprintf("https://www.amazon.es/dp/%s", id)
 	return c.searchURL(u, id, item, callback)
 }
 
-func (c *Client) searchURL(u string, id string, item *Item, callback func(Item) error) error {
+func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, bool) error) error {
 	if item == nil {
 		return fmt.Errorf("api: item is nil")
 	}
@@ -227,12 +227,12 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item) 
 		new = s.Text()
 		return false
 	})
-	if new == "" {
-		return fmt.Errorf("api: price not found: %s", id)
-	}
-	price, err := parsePrice(new)
-	if err != nil {
-		return fmt.Errorf("api: couldn't parse new price: %s: %w", id, err)
+	var price float64
+	if new != "" {
+		price, err = parsePrice(new)
+		if err != nil {
+			return fmt.Errorf("api: couldn't parse new price: %s: %w", id, err)
+		}
 	}
 
 	// search price used
@@ -249,6 +249,10 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item) 
 		}
 	}
 
+	if new == "" && used == "" {
+		return fmt.Errorf("api: price not found: %s", id)
+	}
+
 	if item.ID == "" {
 		item.Price = price
 		item.UsedPrice = usedPrice
@@ -260,17 +264,19 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item) 
 	item.Title = title
 	item.PreviousUsedPrice = item.UsedPrice
 	item.UsedPrice = usedPrice
-
+	if item.Price <= 0 {
+		item.Price = price
+	}
 	if price < item.Price {
 		item.PreviousPrice = item.Price
 		item.Price = price
-		if err := callback(*item); err != nil {
+		if err := callback(*item, true); err != nil {
 			return err
 		}
 	}
 	if item.UsedPrice > 0 && item.UsedPrice < item.Price {
 		if item.PreviousUsedPrice <= 0 || item.UsedPrice < item.PreviousUsedPrice {
-			if err := callback(*item); err != nil {
+			if err := callback(*item, false); err != nil {
 				return err
 			}
 		}
