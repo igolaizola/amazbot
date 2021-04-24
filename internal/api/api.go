@@ -249,16 +249,15 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item) 
 		}
 	}
 
-	item.ID = id
-	item.Link = link
-	item.Title = title
 	if item.ID == "" {
 		item.Price = price
-		item.PreviousUsedPrice = 0
 		item.UsedPrice = usedPrice
 		item.PreviousPrice = 0
 		item.CreatedAt = time.Now().UTC()
 	}
+	item.ID = id
+	item.Link = link
+	item.Title = title
 	item.PreviousUsedPrice = item.UsedPrice
 	item.UsedPrice = usedPrice
 
