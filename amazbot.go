@@ -199,16 +199,20 @@ func Run(ctx context.Context, captchaURL, token, dbPath string, admin int, users
 						key = strings.TrimPrefix(key, prefix)
 					}
 					var link string
-					var price float64
-					var usedPrice string
+					var min float64
+					var new float64
+					var used float64
 					if i, ok := v.(api.Item); ok {
 						link = i.Link
-						price = i.Price
-						if i.UsedPrice > 0 {
-							usedPrice = fmt.Sprintf(" %.2f€", i.UsedPrice)
+						min = i.MinPrice
+						new = i.Prices[0]
+						for j := 1; j < 5; j++ {
+							if used == 0 || i.Prices[j] < used {
+								used = i.Prices[j]
+							}
 						}
 					}
-					bot.messageOpts(user, fmt.Sprintf("running %s %s %.2f€%s", key, link, price, usedPrice), false)
+					bot.messageOpts(user, fmt.Sprintf("running %s %s min:%.2f€, new:%.2f€, used:%.2f€", key, link, min, new, used), false)
 					return true
 				})
 				bot.log(fmt.Sprintf("elapsed: %s", bot.elapsed))
@@ -285,16 +289,13 @@ func (b *bot) search(ctx context.Context, parsed parsedArgs) {
 			b.log(err)
 			return
 		}
-		if err := b.client.Search(parsed.query, &item, func(api.Item, bool) error { return nil }); err != nil {
+		if err := b.client.Search(parsed.query, &item, func(api.Item, int) error { return nil }); err != nil {
 			b.log(err)
 			return
 		}
 	}
-	if err := b.client.Search(parsed.query, &item, func(i api.Item, new bool) error {
-		text := priceUsedMessage(i, parsed.chat)
-		if new {
-			text = priceDownMessage(i, parsed.chat)
-		}
+	if err := b.client.Search(parsed.query, &item, func(i api.Item, state int) error {
+		text := textMessage(i, state, parsed.chat)
 		b.message(parsed.chat, text)
 		return nil
 	}); err != nil {
@@ -401,20 +402,16 @@ func (b *bot) log(obj interface{}) {
 	<-time.After(100 * time.Millisecond)
 }
 
-func priceDownMessage(i api.Item, chat string) string {
+func textMessage(i api.Item, state int, chat string) string {
 	bottom := ""
 	if strings.HasPrefix(chat, "@") {
 		bottom = fmt.Sprintf("\n\n📣 Más anuncios en %s", chat)
 	}
-	return fmt.Sprintf("⚡️ BAJADA DE PRECIO\n\n%s\n\n✅ Precio: %.2f€\n🚫 Anterior: %.2f€\n\n🔗 %s%s",
-		i.Title, i.Price, i.PreviousPrice, i.Link, bottom)
-}
+	if state == 0 {
+		return fmt.Sprintf("⚡️ BAJADA DE PRECIO\n\n%s\n\n✅ Precio: %.2f€\n🚫 Anterior: %.2f€\n\n🔗 %s%s",
+			i.Title, i.Prices[0], i.MinPrice, i.Link, bottom)
+	}
 
-func priceUsedMessage(i api.Item, chat string) string {
-	bottom := ""
-	if strings.HasPrefix(chat, "@") {
-		bottom = fmt.Sprintf("\n\n📣 Más anuncios en %s", chat)
-	}
-	return fmt.Sprintf("♻️ REACONDICIONADO\n\n%s\n\n✅ Precio: %.2f€\n🚫 Nuevo: %.2f€\n\n🔗 %s%s",
-		i.Title, i.UsedPrice, i.Price, i.Link, bottom)
+	return fmt.Sprintf("♻️ REACONDICIONADO\n\n%s\n\n✅ Precio: %.2f€\n🚫 Nuevo: %.2f€\n🎁 Estado: %s\n\n🔗 %s%s",
+		i.Title, i.Prices[state], i.MinPrice, api.StateText(state), i.Link, bottom)
 }

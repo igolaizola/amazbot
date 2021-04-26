@@ -1,7 +1,9 @@
 package api
 
 import (
+	"bytes"
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -19,14 +21,11 @@ import (
 )
 
 type Item struct {
-	ID                string    `json:"id"`
-	Link              string    `json:"link"`
-	Title             string    `json:"title"`
-	Price             float64   `json:"price"`
-	PreviousPrice     float64   `json:"previous_price"`
-	UsedPrice         float64   `json:"used_price"`
-	PreviousUsedPrice float64   `json:"previous_used_price"`
-	CreatedAt         time.Time `json:"created_at"`
+	ID       string     `json:"id"`
+	Link     string     `json:"link"`
+	Title    string     `json:"title"`
+	MinPrice float64    `json:"min_price"`
+	Prices   [5]float64 `json:"previous_price"`
 }
 
 type Client struct {
@@ -102,7 +101,23 @@ func ItemID(link string) (string, bool) {
 	return "", false
 }
 
-func (c *Client) Search(id string, item *Item, callback func(Item, bool) error) error {
+func StateText(s int) string {
+	switch s {
+	case 0:
+		return "Nuevo"
+	case 1:
+		return "Como nuevo"
+	case 2:
+		return "Muy bueno"
+	case 3:
+		return "Bueno"
+	case 4:
+		return "Aceptable"
+	}
+	return ""
+}
+
+func (c *Client) Search(id string, item *Item, callback func(Item, int) error) error {
 	for {
 		select {
 		case <-c.ctx.Done():
@@ -123,91 +138,19 @@ func (c *Client) Search(id string, item *Item, callback func(Item, bool) error) 
 
 var errBadGateway = errors.New("api: 502 bad gateway")
 
-func (c *Client) search(id string, item *Item, callback func(Item, bool) error) error {
+func (c *Client) search(id string, item *Item, callback func(Item, int) error) error {
+	// https://www.amazon.es/dp/B07FCMKK5X/ref=olp_aod_redir_impl1?aod=1
 	u := fmt.Sprintf("https://www.amazon.es/dp/%s", id)
 	return c.searchURL(u, id, item, callback)
 }
 
-func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, bool) error) error {
+func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, int) error) error {
 	if item == nil {
 		return fmt.Errorf("api: item is nil")
 	}
-	r, err := c.client.Get(u)
-	if err != nil {
-		return fmt.Errorf("api: get request failed: %w", err)
-	}
-	if r.StatusCode == 502 {
-		return errBadGateway
-	}
-	if r.StatusCode != 200 {
-		return fmt.Errorf("api: invalid status code: %s", r.Status)
-	}
-	defer r.Body.Close()
-
-	doc, err := goquery.NewDocumentFromReader(r.Body)
+	doc, err := c.getDoc(u, id)
 	if err != nil {
 		return err
-	}
-
-	// search captcha
-	captcha := false
-	doc.Find("#captchacharacters").EachWithBreak(func(i int, s *goquery.Selection) bool {
-		captcha = true
-		return false
-	})
-	if captcha {
-		var img string
-		doc.Find("form img").EachWithBreak(func(i int, s *goquery.Selection) bool {
-			if v, ok := s.Attr("src"); ok {
-				img = v
-				return false
-			}
-			return true
-		})
-		if img == "" {
-			return fmt.Errorf("api: couldn't get captcha image: %s", id)
-		}
-		var amzn string
-		var amznr string
-		doc.Find("form input").Each(func(i int, s *goquery.Selection) {
-			val, ok := s.Attr("value")
-			if !ok {
-				return
-			}
-			name, ok := s.Attr("name")
-			if !ok {
-				return
-			}
-			switch name {
-			case "amzn":
-				amzn = val
-			case "amzn-r":
-				amznr = val
-			}
-		})
-		if amzn == "" {
-			return fmt.Errorf("api: couldn't get amzn value: %s", id)
-		}
-		if amznr == "" {
-			return fmt.Errorf("api: couldn't get amzn-r value: %s", id)
-		}
-
-		// resolve captcha
-		solution, err := c.resolveCaptcha(img)
-		if err != nil {
-			return err
-		}
-
-		u, err := url.Parse("https://www.amazon.es/errors/validateCaptcha")
-		if err != nil {
-			return fmt.Errorf("api: couldn't parse url: %w", err)
-		}
-		q := u.Query()
-		q.Set("amzn", amzn)
-		q.Set("amzn-r", amznr)
-		q.Set("field-keywords", solution)
-		u.RawQuery = q.Encode()
-		return c.searchURL(u.String(), id, item, callback)
 	}
 
 	// search title
@@ -236,67 +179,219 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, 
 		return fmt.Errorf("api: link not found: %s", id)
 	}
 
-	// search price new
-	var new string
-	doc.Find("#priceblock_ourprice").EachWithBreak(func(i int, s *goquery.Selection) bool {
-		new = s.Text()
-		return false
-	})
-	var price float64
-	if new != "" {
-		price, err = parsePrice(new)
+	var prices [5]float64
+	var sha [32]byte
+	i := 0
+	for {
+		u = fmt.Sprintf("https://www.amazon.es/gp/aod/ajax/ref=aod_page_2?asin=%s&pc=dp&pageno=%d", id, i)
+		doc, err := c.getDoc(u, id)
 		if err != nil {
-			return fmt.Errorf("api: couldn't parse new price: %s: %w", id, err)
+			return err
 		}
-	}
-
-	// search price used
-	var used string
-	doc.Find("#olpLinkWidget_feature_div span.a-size-base.a-color-base").EachWithBreak(func(i int, s *goquery.Selection) bool {
-		used = s.Text()
-		return false
-	})
-	var usedPrice float64
-	if used != "" {
-		usedPrice, err = parsePrice(used)
-		if err != nil {
-			return fmt.Errorf("api: couldn't parse used price: %s: %w", id, err)
+		currSHA := sha256.Sum256([]byte(doc.Text()))
+		if bytes.Equal(sha[:], currSHA[:]) {
+			break
 		}
+		if i > 10 {
+			break
+		}
+
+		divs := [][2]string{
+			// First pinned offer
+			{"#pinned-de-id", "#pinned-offer-top-id"},
+			// Other offers
+			{"#aod-offer", "#aod-offer-price"},
+		}
+		for _, div := range divs {
+			doc.Find(div[0]).Each(func(i int, s *goquery.Selection) {
+				state := -1
+				s.Find(fmt.Sprintf("%s #aod-offer-heading", div[0])).EachWithBreak(func(i int, s *goquery.Selection) bool {
+					text := s.Text()
+					text = strings.TrimSpace(text)
+					text = strings.Replace(text, "De 2ª mano", "", 1)
+					text = strings.Replace(text, "-", "", 1)
+					text = strings.TrimSpace(text)
+					switch text {
+					case "Nuevo":
+						state = 0
+					case "Como nuevo":
+						state = 1
+					case "Muy bueno":
+						state = 2
+					case "Bueno":
+						state = 3
+					case "Aceptable":
+						state = 4
+					}
+					return false
+				})
+				if state < 0 {
+					return
+				}
+				var delivery float64
+				s.Find(fmt.Sprintf("%s %s #ddmDeliveryMessage", div[0], div[1])).EachWithBreak(func(i int, s *goquery.Selection) bool {
+					text := s.Text()
+					text = strings.TrimSpace(text)
+					if !strings.HasPrefix(text, "Por ") {
+						return true
+					}
+					idx := strings.Index(text, "€")
+					if idx < 4 {
+						return true
+					}
+					text = text[4:idx]
+					price, err := parsePrice(text)
+					if err != nil {
+						log.Println(fmt.Errorf("api: couldn't parse delivery price %s %s: %w", text, id, err))
+						return true
+					}
+					delivery = price
+					return false
+				})
+				s.Find(fmt.Sprintf("%s %s .a-offscreen", div[0], div[1])).EachWithBreak(func(i int, s *goquery.Selection) bool {
+					text := s.Text()
+					price, err := parsePrice(text)
+					if err != nil {
+						log.Println(fmt.Errorf("api: couldn't parse price %s %s: %w", text, id, err))
+						return true
+					}
+					price = price + delivery
+					if prices[state] == 0 || price < prices[state] {
+						prices[state] = price
+					}
+					return false
+				})
+			})
+		}
+
 	}
 
-	if new == "" && used == "" {
-		return fmt.Errorf("api: price not found: %s", id)
+	found := false
+	for _, p := range prices {
+		if p == 0 {
+			continue
+		}
+		found = true
+		break
 	}
 
-	if item.ID == "" {
-		item.Price = price
-		item.UsedPrice = usedPrice
-		item.PreviousPrice = 0
-		item.CreatedAt = time.Now().UTC()
+	if !found {
+		return fmt.Errorf("api: prices not found: %s", id)
 	}
+
 	item.ID = id
 	item.Link = link
 	item.Title = title
-	item.PreviousUsedPrice = item.UsedPrice
-	item.UsedPrice = usedPrice
-	if item.Price <= 0 {
-		item.Price = price
+	prevMin := item.MinPrice
+	if item.MinPrice == 0 {
+		item.MinPrice = prices[0]
 	}
-	if price < item.Price {
-		item.PreviousPrice = item.Price
-		item.Price = price
-		if err := callback(*item, true); err != nil {
+	prev := item.Prices
+	item.Prices = prices
+	for i, p := range prices {
+		// Price not found, continue
+		if p == 0 {
+			continue
+		}
+		// Skip first stored min price
+		if prevMin == 0 && i == 0 {
+			continue
+		}
+		// Skip prices higher than previous ones
+		if prev[i] > 0 && p >= prev[i] {
+			continue
+		}
+		// Skip prices higher than min
+		if item.MinPrice > 0 && p >= item.MinPrice {
+			continue
+		}
+		if err := callback(*item, i); err != nil {
 			return err
 		}
 	}
-	if item.UsedPrice > 0 && item.UsedPrice < item.Price {
-		if item.PreviousUsedPrice <= 0 || item.UsedPrice < item.PreviousUsedPrice {
-			if err := callback(*item, false); err != nil {
-				return err
-			}
-		}
-	}
+
 	return nil
+}
+
+func (c *Client) getDoc(u string, id string) (*goquery.Document, error) {
+	r, err := c.client.Get(u)
+	if err != nil {
+		return nil, fmt.Errorf("api: get request failed: %w", err)
+	}
+	if r.StatusCode == 502 {
+		return nil, errBadGateway
+	}
+	if r.StatusCode != 200 {
+		return nil, fmt.Errorf("api: invalid status code: %s", r.Status)
+	}
+	defer r.Body.Close()
+
+	doc, err := goquery.NewDocumentFromReader(r.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// search captcha
+	captcha := false
+	doc.Find("#captchacharacters").EachWithBreak(func(i int, s *goquery.Selection) bool {
+		captcha = true
+		return false
+	})
+	if captcha {
+		var img string
+		doc.Find("form img").EachWithBreak(func(i int, s *goquery.Selection) bool {
+			if v, ok := s.Attr("src"); ok {
+				img = v
+				return false
+			}
+			return true
+		})
+		if img == "" {
+			return nil, fmt.Errorf("api: couldn't get captcha image: %s", id)
+		}
+		var amzn string
+		var amznr string
+		doc.Find("form input").Each(func(i int, s *goquery.Selection) {
+			val, ok := s.Attr("value")
+			if !ok {
+				return
+			}
+			name, ok := s.Attr("name")
+			if !ok {
+				return
+			}
+			switch name {
+			case "amzn":
+				amzn = val
+			case "amzn-r":
+				amznr = val
+			}
+		})
+		if amzn == "" {
+			return nil, fmt.Errorf("api: couldn't get amzn value: %s", id)
+		}
+		if amznr == "" {
+			return nil, fmt.Errorf("api: couldn't get amzn-r value: %s", id)
+		}
+
+		// resolve captcha
+		solution, err := c.resolveCaptcha(img)
+		if err != nil {
+			return nil, err
+		}
+
+		u, err := url.Parse("https://www.amazon.es/errors/validateCaptcha")
+		if err != nil {
+			return nil, fmt.Errorf("api: couldn't parse url: %w", err)
+		}
+		q := u.Query()
+		q.Set("amzn", amzn)
+		q.Set("amzn-r", amznr)
+		q.Set("field-keywords", solution)
+		u.RawQuery = q.Encode()
+		return c.getDoc(u.String(), id)
+	}
+	return doc, nil
 }
 
 func (c *Client) resolveCaptcha(link string) (string, error) {
