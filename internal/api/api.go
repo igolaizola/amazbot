@@ -25,7 +25,7 @@ type Item struct {
 	Link     string     `json:"link"`
 	Title    string     `json:"title"`
 	MinPrice float64    `json:"min_price"`
-	Prices   [5]float64 `json:"previous_price"`
+	Prices   [5]float64 `json:"prices"`
 }
 
 type Client struct {
@@ -139,7 +139,6 @@ func (c *Client) Search(id string, item *Item, callback func(Item, int) error) e
 var errBadGateway = errors.New("api: 502 bad gateway")
 
 func (c *Client) search(id string, item *Item, callback func(Item, int) error) error {
-	// https://www.amazon.es/dp/B07FCMKK5X/ref=olp_aod_redir_impl1?aod=1
 	u := fmt.Sprintf("https://www.amazon.es/dp/%s", id)
 	return c.searchURL(u, id, item, callback)
 }
@@ -148,7 +147,7 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, 
 	if item == nil {
 		return fmt.Errorf("api: item is nil")
 	}
-	doc, err := c.getDoc(u, id)
+	doc, err := c.getDoc(u, id, 0)
 	if err != nil {
 		return err
 	}
@@ -184,7 +183,7 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, 
 	i := 0
 	for {
 		u = fmt.Sprintf("https://www.amazon.es/gp/aod/ajax/ref=aod_page_2?asin=%s&pc=dp&pageno=%d", id, i)
-		doc, err := c.getDoc(u, id)
+		doc, err := c.getDoc(u, id, 0)
 		if err != nil {
 			return err
 		}
@@ -192,9 +191,11 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, 
 		if bytes.Equal(sha[:], currSHA[:]) {
 			break
 		}
+		sha = currSHA
 		if i > 10 {
 			break
 		}
+		i++
 
 		divs := [][2]string{
 			// First pinned offer
@@ -279,6 +280,8 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, 
 		return fmt.Errorf("api: prices not found: %s", id)
 	}
 
+	log.Println("prices", prices)
+
 	item.ID = id
 	item.Link = link
 	item.Title = title
@@ -287,6 +290,9 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, 
 		item.MinPrice = prices[0]
 	}
 	prev := item.Prices
+	for i, p := range prices {
+		item.Prices[i] = p
+	}
 	item.Prices = prices
 	for i, p := range prices {
 		// Price not found, continue
@@ -313,7 +319,11 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, 
 	return nil
 }
 
-func (c *Client) getDoc(u string, id string) (*goquery.Document, error) {
+func (c *Client) getDoc(u string, id string, depth int) (*goquery.Document, error) {
+	if depth > 2 {
+		return nil, fmt.Errorf("api: recursion aborted on depth %d", depth)
+	}
+	log.Printf("request %s: %s\n", u, id)
 	r, err := c.client.Get(u)
 	if err != nil {
 		return nil, fmt.Errorf("api: get request failed: %w", err)
@@ -338,6 +348,7 @@ func (c *Client) getDoc(u string, id string) (*goquery.Document, error) {
 		return false
 	})
 	if captcha {
+		log.Printf("captcha requested: %s", id)
 		var img string
 		doc.Find("form img").EachWithBreak(func(i int, s *goquery.Selection) bool {
 			if v, ok := s.Attr("src"); ok {
@@ -389,7 +400,7 @@ func (c *Client) getDoc(u string, id string) (*goquery.Document, error) {
 		q.Set("amzn-r", amznr)
 		q.Set("field-keywords", solution)
 		u.RawQuery = q.Encode()
-		return c.getDoc(u.String(), id)
+		return c.getDoc(u.String(), id, depth+1)
 	}
 	return doc, nil
 }
@@ -456,7 +467,7 @@ func (t *transport) RoundTrip(r *http.Request) (*http.Response, error) {
 	defer func() {
 		select {
 		case <-t.ctx.Done():
-		case <-time.After(5000 * time.Millisecond):
+		case <-time.After(1000 * time.Millisecond):
 		}
 		t.lock.Unlock()
 	}()

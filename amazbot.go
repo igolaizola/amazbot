@@ -93,6 +93,7 @@ func Run(ctx context.Context, captchaURL, token, dbPath string, admin int, users
 				return true
 			})
 			sort.Strings(keys)
+			log.Println("search keys", keys)
 			for _, k := range keys {
 				log.Println(fmt.Sprintf("searching: %s", k))
 				select {
@@ -180,7 +181,7 @@ func Run(ctx context.Context, captchaURL, token, dbPath string, admin int, users
 				if err != nil {
 					bot.message(user, err.Error())
 				} else {
-					bot.searchs.Store(parsed.id, struct{}{})
+					bot.searchs.Store(parsed.id, nil)
 				}
 				bot.message(user, fmt.Sprintf("searching %s", parsed.id))
 			case "status":
@@ -283,7 +284,7 @@ func (b *bot) search(ctx context.Context, parsed parsedArgs) {
 	if err := b.db.Get("db", parsed.id, &item); err != nil {
 		b.log(err)
 	}
-	if item.ID == "" {
+	/*if item.ID == "" {
 		// store search with empty items on db
 		if err := b.db.Put("db", parsed.id, item); err != nil {
 			b.log(err)
@@ -293,7 +294,7 @@ func (b *bot) search(ctx context.Context, parsed parsedArgs) {
 			b.log(err)
 			return
 		}
-	}
+	}*/
 	if err := b.client.Search(parsed.query, &item, func(i api.Item, state int) error {
 		text := textMessage(i, state, parsed.chat)
 		b.message(parsed.chat, text)

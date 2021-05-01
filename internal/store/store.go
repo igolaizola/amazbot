@@ -1,8 +1,6 @@
 package store
 
 import (
-	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -55,8 +53,7 @@ func (s *Store) Get(bucket, key string, val interface{}) error {
 	if err := s.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
 		if v := b.Get([]byte(key)); len(v) > 0 {
-			dec := json.NewDecoder(bytes.NewReader(v))
-			if err := dec.Decode(val); err != nil {
+			if err := json.Unmarshal(v, val); err != nil {
 				return fmt.Errorf("couldn't decode: %w", err)
 			}
 		}
@@ -70,12 +67,11 @@ func (s *Store) Get(bucket, key string, val interface{}) error {
 func (s *Store) Put(bucket, key string, val interface{}) error {
 	if err := s.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
-		var buf bytes.Buffer
-		enc := json.NewEncoder(bufio.NewWriter(&buf))
-		if err := enc.Encode(val); err != nil {
+		byt, err := json.Marshal(val)
+		if err != nil {
 			return fmt.Errorf("couldn't encode: %w", err)
 		}
-		return b.Put([]byte(key), buf.Bytes())
+		return b.Put([]byte(key), byt)
 	}); err != nil {
 		return fmt.Errorf("store: couldn't put %s: %w", key, err)
 	}
