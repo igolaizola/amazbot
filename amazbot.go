@@ -208,6 +208,9 @@ func Run(ctx context.Context, captchaURL, proxy, token, dbPath string, admin int
 						min = i.MinPrice
 						new = i.Prices[0]
 						for j := 1; j < 5; j++ {
+							if i.Prices[j] == 0 {
+								continue
+							}
 							if used == 0 || i.Prices[j] < used {
 								used = i.Prices[j]
 							}
