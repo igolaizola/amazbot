@@ -129,14 +129,14 @@ func (c *Client) Search(id string, item *Item, callback func(Item, int) error) e
 		if errors.As(err, &netErr) && netErr.Timeout() {
 			continue
 		}
-		if errors.Is(err, errServer) {
+		if errors.Is(err, errRetry) {
 			continue
 		}
 		return err
 	}
 }
 
-var errServer = errors.New("api: 50X status code")
+var errRetry = errors.New("api: retriable error")
 
 func (c *Client) search(id string, item *Item, callback func(Item, int) error) error {
 	u := fmt.Sprintf("https://www.amazon.es/dp/%s", id)
@@ -328,8 +328,8 @@ func (c *Client) getDoc(u string, id string, depth int) (*goquery.Document, erro
 	if err != nil {
 		return nil, fmt.Errorf("api: get request failed: %w", err)
 	}
-	if r.StatusCode >= 500 && r.StatusCode < 600 {
-		return nil, errServer
+	if r.StatusCode == 502 {
+		return nil, errRetry
 	}
 	if r.StatusCode != 200 {
 		return nil, fmt.Errorf("api: invalid status code: %s", r.Status)
@@ -467,7 +467,7 @@ func (t *transport) RoundTrip(r *http.Request) (*http.Response, error) {
 	defer func() {
 		select {
 		case <-t.ctx.Done():
-		case <-time.After(3000 * time.Millisecond):
+		case <-time.After(5000 * time.Millisecond):
 		}
 		t.lock.Unlock()
 	}()
