@@ -33,32 +33,32 @@ type Client struct {
 	client     *http.Client
 	ctx        context.Context
 	captchaURL string
+	transport  *transport
 }
 
 func New(ctx context.Context, captchaURL, proxyURL string) (*Client, error) {
-	cookieJar, err := cookiejar.New(nil)
-	if err != nil {
-		return nil, fmt.Errorf("api: could not create cookie jar: %w", err)
-	}
 	captchaURL = strings.TrimLeft(captchaURL, "/")
 	if captchaURL != "" {
-		_, err = url.Parse(captchaURL)
+		_, err := url.Parse(captchaURL)
 		if err != nil {
 			return nil, fmt.Errorf("api: couldn't parse captcha service url %s: %w", captchaURL, err)
 		}
 	}
 	tr, err := newTransport(ctx, proxyURL)
 	if err != nil {
-	  return nil, err
+		return nil, err
 	}
 	cli := &Client{
 		ctx: ctx,
 		client: &http.Client{
 			Timeout:   30 * time.Second,
 			Transport: tr,
-			Jar:       cookieJar,
 		},
 		captchaURL: captchaURL,
+		transport:  tr,
+	}
+	if err := cli.reset(); err != nil {
+		return nil, err
 	}
 	// test captcha resolver
 	if captchaURL != "" {
@@ -72,7 +72,6 @@ func New(ctx context.Context, captchaURL, proxyURL string) (*Client, error) {
 			log.Println("api: captcha resolver test succeeded")
 		}
 	}
-	cli.client.Get("https://www.amazon.es")
 	return cli, nil
 }
 
@@ -334,6 +333,9 @@ func (c *Client) getDoc(u string, id string, depth int) (*goquery.Document, erro
 	if r.StatusCode == 502 {
 		return nil, errRetry
 	}
+	if r.StatusCode == 503 {
+		c.reset()
+	}
 	if r.StatusCode != 200 {
 		return nil, fmt.Errorf("api: invalid status code: %s", r.Status)
 	}
@@ -413,7 +415,10 @@ func (c *Client) resolveCaptcha(link string) (string, error) {
 		return "", errors.New("api:missing captcha service")
 	}
 	u := fmt.Sprintf("%s/%s", c.captchaURL, link)
-	r, err := c.client.Get(u)
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	r, err := client.Get(u)
 	if err != nil {
 		return "", fmt.Errorf("api: get request failed: %w", err)
 	}
@@ -432,6 +437,17 @@ func (c *Client) resolveCaptcha(link string) (string, error) {
 	return captcha, nil
 }
 
+func (c *Client) reset() error {
+	c.transport.userAgent = randomUserAgent()
+	cookieJar, err := cookiejar.New(nil)
+	if err != nil {
+		return fmt.Errorf("api: could not create cookie jar: %w", err)
+	}
+	c.client.Jar = cookieJar
+	c.client.Get("https://www.amazon.es")
+	return nil
+}
+
 func parsePrice(text string) (float64, error) {
 	text = strings.TrimSpace(text)
 	text = strings.Trim(text, "€$")
@@ -446,36 +462,40 @@ func parsePrice(text string) (float64, error) {
 }
 
 func newTransport(ctx context.Context, proxyURL string) (*transport, error) {
-  tr := http.DefaultTransport
-  if proxyURL != "" {
-    u, err := url.Parse(proxyURL)
-    if err != nil {
-      return nil, fmt.Errorf("api: couldn't parse proxy %s: %w", proxyURL, err)
-    }
-    if u.Scheme != "socks5" {
-      return nil, fmt.Errorf("api: unsupported scheme: %s", u.Scheme)
-    }
-    // Create a socks5 dialer
-	  dialer, err := proxy.SOCKS5("tcp", u.Host, nil, proxy.Direct)
-	  if err != nil {
-		  return nil, fmt.Errorf("api: couldn't create socks5 proxy: %w", err)
-	  }
-
-	  // Setup HTTP transport
-	  tr = &http.Transport{
-		  Dial: dialer.Dial,
-	  }
-  }
-  return &transport{
-    ctx: ctx,
-    tr:  tr,
-  }, nil
+	tr := http.DefaultTransport
+	if proxyURL != "" {
+		u, err := url.Parse(proxyURL)
+		if err != nil {
+			return nil, fmt.Errorf("api: couldn't parse proxy %s: %w", proxyURL, err)
+		}
+		switch u.Scheme {
+		case "socks5":
+			// Create a socks5 dialer
+			dialer, err := proxy.SOCKS5("tcp", u.Host, nil, proxy.Direct)
+			if err != nil {
+				return nil, fmt.Errorf("api: couldn't create socks5 proxy: %w", err)
+			}
+			tr = &http.Transport{
+				Dial: dialer.Dial,
+			}
+		default:
+			tr = &http.Transport{Proxy: http.ProxyURL(u)}
+		}
+		if u.Scheme != "socks5" {
+			return nil, fmt.Errorf("api: unsupported scheme: %s", u.Scheme)
+		}
+	}
+	return &transport{
+		ctx: ctx,
+		tr:  tr,
+	}, nil
 }
 
 type transport struct {
-	lock sync.Mutex
-	ctx  context.Context
-	tr   http.RoundTripper
+	lock      sync.Mutex
+	ctx       context.Context
+	tr        http.RoundTripper
+	userAgent string
 }
 
 func (t *transport) RoundTrip(r *http.Request) (*http.Response, error) {
@@ -486,7 +506,7 @@ func (t *transport) RoundTrip(r *http.Request) (*http.Response, error) {
 	r.Header.Set("sec-ch-ua", `"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"`)
 	r.Header.Set("sec-ch-ua-mobile", "?0")
 	r.Header.Set("upgrade-insecure-requests", "1")
-	r.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36")
+	r.Header.Set("user-agent", t.userAgent)
 	r.Header.Set("accept", "ext/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
 	r.Header.Set("sec-fetch-site", "none")
 	r.Header.Set("sec-fetch-mode", "navigate")
