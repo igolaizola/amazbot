@@ -162,7 +162,7 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, 
 	})
 	if title == "" {
 		h, _ := doc.Html()
-		ioutil.WriteFile("err.html", []byte(h), 0644)
+		ioutil.WriteFile(fmt.Sprintf("%s_err.html", id), []byte(h), 0644)
 		return fmt.Errorf("api: title not found: %s", id)
 	}
 
@@ -279,6 +279,8 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, 
 	}
 
 	if !found {
+		h, _ := doc.Html()
+		ioutil.WriteFile(fmt.Sprintf("%s_err.html", id), []byte(h), 0644)
 		return fmt.Errorf("api: prices not found: %s", id)
 	}
 
