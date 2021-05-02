@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"golang.org/x/net/proxy"
 )
 
 type Item struct {
@@ -34,7 +35,7 @@ type Client struct {
 	captchaURL string
 }
 
-func New(ctx context.Context, captchaURL, proxy string) (*Client, error) {
+func New(ctx context.Context, captchaURL, proxyURL string) (*Client, error) {
 	cookieJar, err := cookiejar.New(nil)
 	if err != nil {
 		return nil, fmt.Errorf("api: could not create cookie jar: %w", err)
@@ -46,7 +47,7 @@ func New(ctx context.Context, captchaURL, proxy string) (*Client, error) {
 			return nil, fmt.Errorf("api: couldn't parse captcha service url %s: %w", captchaURL, err)
 		}
 	}
-	tr, err := newTransport(ctx, proxy)
+	tr, err := newTransport(ctx, proxyURL)
 	if err != nil {
 	  return nil, err
 	}
@@ -444,12 +445,12 @@ func parsePrice(text string) (float64, error) {
 	return price, nil
 }
 
-func newTransport(ctx context.Context, proxy string) (*transport, error) {
+func newTransport(ctx context.Context, proxyURL string) (*transport, error) {
   tr := http.DefaultTransport
-  if proxy != "" {
-    u, err := url.Parse(proxy)
+  if proxyURL != "" {
+    u, err := url.Parse(proxyURL)
     if err != nil {
-      return nil, fmt.Errorf("api: couldn't parse proxy %s: %w", proxy, err)
+      return nil, fmt.Errorf("api: couldn't parse proxy %s: %w", proxyURL, err)
     }
     if u.Scheme != "socks5" {
       return nil, fmt.Errorf("api: unsupported scheme: %s", u.Scheme)
@@ -468,7 +469,7 @@ func newTransport(ctx context.Context, proxy string) (*transport, error) {
   return &transport{
     ctx: ctx,
     tr:  tr,
-  }
+  }, nil
 }
 
 type transport struct {
