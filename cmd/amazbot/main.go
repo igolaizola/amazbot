@@ -17,6 +17,7 @@ func main() {
 	token := flag.String("token", "", "telegram bot token")
 	db := flag.String("db", "amazbot.db", "database file path")
 	captchaURL := flag.String("captcha", "http://localhost:8080", "captcha resolver web service address")
+	proxy := flag.String("proxy", "", "proxy address")
 	admin := flag.Int("admin", 0, "admin chat id that controls the bot")
 	var users arrayFlags
 	flag.Var(&users, "user", "user chat id allowed to control the bot")
@@ -47,7 +48,7 @@ func main() {
 	}()
 
 	// Run bot
-	if err := amazbot.Run(ctx, *captchaURL, *token, *db, *admin, users); err != nil {
+	if err := amazbot.Run(ctx, *captchaURL, *proxy, *token, *db, *admin, users); err != nil {
 		log.Fatal(err)
 	}
 }

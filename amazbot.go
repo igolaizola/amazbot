@@ -26,7 +26,7 @@ type bot struct {
 	elapsed time.Duration
 }
 
-func Run(ctx context.Context, captchaURL, token, dbPath string, admin int, users []int) error {
+func Run(ctx context.Context, captchaURL, proxy, token, dbPath string, admin int, users []int) error {
 	db, err := store.New(dbPath)
 	if err != nil {
 		log.Fatal(err)
@@ -39,7 +39,7 @@ func Run(ctx context.Context, captchaURL, token, dbPath string, admin int, users
 	}
 	//botAPI.Debug = true
 
-	apiCli, err := api.New(ctx, captchaURL)
+	apiCli, err := api.New(ctx, captchaURL, proxy)
 	if err != nil {
 		return fmt.Errorf("couldn't create api client: %w", err)
 	}

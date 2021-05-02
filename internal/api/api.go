@@ -34,7 +34,7 @@ type Client struct {
 	captchaURL string
 }
 
-func New(ctx context.Context, captchaURL string) (*Client, error) {
+func New(ctx context.Context, captchaURL, proxy string) (*Client, error) {
 	cookieJar, err := cookiejar.New(nil)
 	if err != nil {
 		return nil, fmt.Errorf("api: could not create cookie jar: %w", err)
@@ -46,14 +46,16 @@ func New(ctx context.Context, captchaURL string) (*Client, error) {
 			return nil, fmt.Errorf("api: couldn't parse captcha service url %s: %w", captchaURL, err)
 		}
 	}
+	tr, err := newTransport(ctx, proxy)
+	if err != nil {
+	  return nil, err
+	}
 	cli := &Client{
 		ctx: ctx,
 		client: &http.Client{
-			Timeout: 10 * time.Second,
-			Transport: &transport{
-				ctx: ctx,
-			},
-			Jar: cookieJar,
+			Timeout:   30 * time.Second,
+			Transport: tr,
+			Jar:       cookieJar,
 		},
 		captchaURL: captchaURL,
 	}
@@ -442,9 +444,37 @@ func parsePrice(text string) (float64, error) {
 	return price, nil
 }
 
+func newTransport(ctx context.Context, proxy string) (*transport, error) {
+  tr := http.DefaultTransport
+  if proxy != "" {
+    u, err := url.Parse(proxy)
+    if err != nil {
+      return nil, fmt.Errorf("api: couldn't parse proxy %s: %w", proxy, err)
+    }
+    if u.Scheme != "socks5" {
+      return nil, fmt.Errorf("api: unsupported scheme: %s", u.Scheme)
+    }
+    // Create a socks5 dialer
+	  dialer, err := proxy.SOCKS5("tcp", u.Host, nil, proxy.Direct)
+	  if err != nil {
+		  return nil, fmt.Errorf("api: couldn't create socks5 proxy: %w", err)
+	  }
+
+	  // Setup HTTP transport
+	  tr = &http.Transport{
+		  Dial: dialer.Dial,
+	  }
+  }
+  return &transport{
+    ctx: ctx,
+    tr:  tr,
+  }
+}
+
 type transport struct {
 	lock sync.Mutex
 	ctx  context.Context
+	tr   http.RoundTripper
 }
 
 func (t *transport) RoundTrip(r *http.Request) (*http.Response, error) {
@@ -471,5 +501,5 @@ func (t *transport) RoundTrip(r *http.Request) (*http.Response, error) {
 		}
 		t.lock.Unlock()
 	}()
-	return http.DefaultTransport.RoundTrip(r)
+	return t.tr.RoundTrip(r)
 }
