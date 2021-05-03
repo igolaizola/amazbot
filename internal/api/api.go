@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -324,11 +325,19 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, 
 }
 
 func (c *Client) getDoc(u string, id string, depth int) (*goquery.Document, error) {
+	req, err := http.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, fmt.Errorf("api: couldn't create request: %w", err)
+	}
+	return c.getDocWithReq(req, id, depth)
+}
+
+func (c *Client) getDocWithReq(req *http.Request, id string, depth int) (*goquery.Document, error) {
 	if depth > 2 {
 		return nil, fmt.Errorf("api: recursion aborted on depth %d", depth)
 	}
-	log.Printf("request %s: %s\n", u, id)
-	r, err := c.client.Get(u)
+	log.Printf("request %s: %s\n", req.URL, id)
+	r, err := c.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("api: get request failed: %w", err)
 	}
@@ -338,7 +347,7 @@ func (c *Client) getDoc(u string, id string, depth int) (*goquery.Document, erro
 	if r.StatusCode == 503 {
 		c.reset()
 	}
-	if r.StatusCode != 200 {
+	if r.StatusCode != 200 && r.StatusCode != 202 {
 		return nil, fmt.Errorf("api: invalid status code: %s", r.Status)
 	}
 	defer r.Body.Close()
@@ -446,8 +455,104 @@ func (c *Client) reset() error {
 		return fmt.Errorf("api: could not create cookie jar: %w", err)
 	}
 	c.client.Jar = cookieJar
-	c.client.Get("https://www.amazon.es")
+	u := "https://www.amazon.es"
+	doc, err := c.getDoc(u, "", 0)
+	if err != nil {
+		return err
+	}
+	postalCode := "44001"
+	hasLocation := false
+	doc.Find("#glow-ingress-line2").EachWithBreak(func(i int, s *goquery.Selection) bool {
+		if !strings.Contains(s.Text(), postalCode) {
+			return true
+		}
+		hasLocation = true
+		return false
+	})
+	if !hasLocation {
+		if err := c.changeLocation(doc, postalCode); err != nil {
+			return err
+		}
+	}
+
 	return nil
+}
+
+func (c *Client) changeLocation(doc *goquery.Document, postalCode string) error {
+	modal := locationModal{}
+	doc.Find("#nav-global-location-data-modal-action").EachWithBreak(func(i int, s *goquery.Selection) bool {
+		data, ok := s.Attr("data-a-modal")
+		if !ok {
+			return true
+		}
+		if err := json.Unmarshal([]byte(data), &modal); err != nil {
+			log.Println(fmt.Errorf("api: couldn't unmarshal location modal: %w", err))
+			return true
+		}
+		return false
+	})
+	if modal.URL == "" {
+		return fmt.Errorf("api: couldn't find location modal")
+	}
+
+	u := fmt.Sprintf("https://www.amazon.es/%s", strings.TrimLeft(modal.URL, "/"))
+	req, err := http.NewRequest("GET", u, nil)
+	if err != nil {
+		return fmt.Errorf("api: couldn't create post request: %w", err)
+	}
+	req.Header.Add("anti-csrftoken-a2z", modal.Ajax.Token)
+	doc, err = c.getDocWithReq(req, "", 0)
+	if err != nil {
+		return err
+	}
+
+	var token string
+	doc.Find("script").EachWithBreak(func(i int, s *goquery.Selection) bool {
+		text := s.Text()
+		idx := strings.Index(text, "CSRF_TOKEN")
+		if idx < 0 {
+			return true
+		}
+		split := strings.Split(text[idx:], "\"")
+		if len(split) < 2 {
+			return true
+		}
+		token = split[1]
+		if token == "" {
+			return false
+		}
+		return true
+	})
+
+	u = "https://www.amazon.es/gp/delivery/ajax/address-change.html"
+	form := url.Values{}
+	form.Add("locationType", "LOCATION_INPUT")
+	form.Add("zipCode", postalCode)
+	form.Add("storeContext", "generic")
+	form.Add("deviceType", "web")
+	form.Add("pageType", "Gateway")
+	form.Add("actionSource", "glow")
+	form.Add("almBrandId", "undefined")
+	req, err = http.NewRequest("POST", u, strings.NewReader(form.Encode()))
+	if err != nil {
+		return fmt.Errorf("api: couldn't create post request: %w", err)
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("anti-csrftoken-a2z", token)
+	_, err = c.getDocWithReq(req, "", 0)
+	if err != nil {
+		return fmt.Errorf("api: post request failed: %w", err)
+	}
+	return nil
+}
+
+type locationModal struct {
+	Ajax ajaxHeaders `json:"ajaxHeaders"`
+	URL  string      `json:"url"`
+}
+
+type ajaxHeaders struct {
+	Token string `json:"anti-csrftoken-a2z"`
 }
 
 func parsePrice(text string) (float64, error) {
