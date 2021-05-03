@@ -290,7 +290,7 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, 
 	item.Link = link
 	item.Title = title
 	prevMin := item.MinPrice
-	if item.MinPrice == 0 {
+	if item.MinPrice == 0 || prices[0] < item.MinPrice {
 		item.MinPrice = prices[0]
 	}
 	prev := item.Prices
