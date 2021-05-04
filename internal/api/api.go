@@ -220,12 +220,12 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, 
 						state = 0
 					case "Como nuevo":
 						state = 1
-					case "Muy bueno":
-						state = 2
+				  case "Muy bueno":
+					  state = 2
 					case "Bueno":
-						state = 3
+					 state = 3
 					case "Aceptable":
-						state = 4
+					 state = 4
 					}
 					return false
 				})
@@ -300,6 +300,10 @@ func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, 
 	}
 	item.Prices = prices
 	for i, p := range prices {
+	  // TODO(igolaizola): disabled some states
+	  if i > 1 {
+	    break
+	  }
 		// Price not found, continue
 		if p == 0 {
 			continue
