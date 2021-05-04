@@ -45,9 +45,9 @@ func Run(ctx context.Context, captchaURL, proxy, token, dbPath string, admin int
 	if err != nil {
 		return fmt.Errorf("couldn't create api client: %w", err)
 	}
-	// Create a cache with a default expiration time of 5 minutes, and which
-	// purges expired items every 10 minutes
-	cach := cache.New(time.Hour, time.Hour)
+
+	// Cache with expiration
+	cach := cache.New(6*time.Hour, 6*time.Hour)
 
 	bot := &bot{
 		BotAPI: botAPI,
