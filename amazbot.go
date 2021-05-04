@@ -13,6 +13,7 @@ import (
 	tgbot "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/igolaizola/amazbot/internal/api"
 	"github.com/igolaizola/amazbot/internal/store"
+	"github.com/patrickmn/go-cache"
 )
 
 type bot struct {
@@ -24,6 +25,7 @@ type bot struct {
 	client  *api.Client
 	wg      sync.WaitGroup
 	elapsed time.Duration
+	cache   *cache.Cache
 }
 
 func Run(ctx context.Context, captchaURL, proxy, token, dbPath string, admin int, users []int) error {
@@ -43,11 +45,16 @@ func Run(ctx context.Context, captchaURL, proxy, token, dbPath string, admin int
 	if err != nil {
 		return fmt.Errorf("couldn't create api client: %w", err)
 	}
+	// Create a cache with a default expiration time of 5 minutes, and which
+	// purges expired items every 10 minutes
+	cach := cache.New(time.Hour, time.Hour)
+
 	bot := &bot{
 		BotAPI: botAPI,
 		db:     db,
 		client: apiCli,
 		admin:  admin,
+		cache:  cach,
 	}
 
 	users = append(users, admin)
@@ -299,8 +306,13 @@ func (b *bot) search(ctx context.Context, parsed parsedArgs) {
 		}
 	}*/
 	if err := b.client.Search(parsed.query, &item, func(i api.Item, state int) error {
+		cacheID := fmt.Sprintf("%s/%s/%d/%.2f", parsed.chat, i.ID, state, i.Prices[state])
+		if _, ok := b.cache.Get(cacheID); ok {
+			return nil
+		}
 		text := textMessage(i, state, parsed.chat)
 		b.message(parsed.chat, text)
+		b.cache.Set(cacheID, struct{}{}, cache.DefaultExpiration)
 		return nil
 	}); err != nil {
 		b.log(err)
