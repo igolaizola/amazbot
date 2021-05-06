@@ -2,6 +2,7 @@ package amazbot
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"sort"
@@ -150,11 +151,16 @@ func Run(ctx context.Context, captchaURL, proxy, token, dbPath string, admin int
 		// Extract command from callback
 		if update.CallbackQuery != nil {
 			user = int(update.CallbackQuery.From.ID)
+			b, err := base64.URLEncoding.DecodeString(update.CallbackQuery.Data)
+			if err != nil {
+				bot.log(err)
+			}
+			data := string(b)
 			if _, err := bot.AnswerCallbackQuery(tgbot.NewCallback(update.CallbackQuery.ID, "")); err != nil {
 				bot.log(err)
 				continue
 			}
-			split := strings.SplitN(update.CallbackQuery.Data, " ", 2)
+			split := strings.SplitN(data, " ", 2)
 			command = strings.TrimPrefix(split[0], "/")
 			if len(split) > 1 {
 				args = split[1]
@@ -250,9 +256,10 @@ func Run(ctx context.Context, captchaURL, proxy, token, dbPath string, admin int
 						}
 					}
 				}
+				data := base64.URLEncoding.EncodeToString([]byte(fmt.Sprintf("/stop %s", key)))
 				btns := []tgbot.InlineKeyboardButton{
 					tgbot.NewInlineKeyboardButtonURL("link", link),
-					tgbot.NewInlineKeyboardButtonData("stop", fmt.Sprintf("/stop %s", key)),
+					tgbot.NewInlineKeyboardButtonData("stop", data),
 				}
 
 				bot.messageOpts(user, fmt.Sprintf("%s %s\nmin:%.2f€, new:%.2f€, used:%.2f€", key, title, min, new, used), false, btns)
