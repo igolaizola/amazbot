@@ -166,9 +166,6 @@ func Run(ctx context.Context, captchaURL, proxy, token, dbPath string, admin int
 			bot.printChatID(update.Message)
 
 			user = int(update.Message.Chat.ID)
-			if _, ok := userChats[user]; !ok {
-				continue
-			}
 
 			// Launch search from link pasted
 			if id, ok := api.ItemID(update.Message.Text); ok {
@@ -185,6 +182,12 @@ func Run(ctx context.Context, captchaURL, proxy, token, dbPath string, admin int
 				args = update.Message.CommandArguments()
 			}
 		}
+
+		// Check if user is valid
+		if _, ok := userChats[user]; !ok {
+			continue
+		}
+
 		if command == "" {
 			continue
 		}
