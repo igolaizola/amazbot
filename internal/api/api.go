@@ -125,6 +125,7 @@ func StateText(s int) string {
 }
 
 func (c *Client) Search(id string, item *Item, callback func(Item, int) error) error {
+	var retry bool
 	for {
 		select {
 		case <-c.ctx.Done():
@@ -137,23 +138,24 @@ func (c *Client) Search(id string, item *Item, callback func(Item, int) error) e
 			continue
 		}
 		if errors.Is(err, errRetry) {
+			c.reset()
+			if retry {
+				return err
+			}
+			retry = true
 			continue
 		}
 		return err
 	}
 }
 
-var errRetry = errors.New("api: retriable error")
+var errRetry = errors.New("retriable error")
 
 func (c *Client) search(id string, item *Item, callback func(Item, int) error) error {
-	u := fmt.Sprintf("https://www.amazon.es/dp/%s", id)
-	return c.searchURL(u, id, item, callback)
-}
-
-func (c *Client) searchURL(u string, id string, item *Item, callback func(Item, int) error) error {
 	if item == nil {
 		return fmt.Errorf("api: item is nil")
 	}
+	u := fmt.Sprintf("https://www.amazon.es/dp/%s", id)
 	doc, err := c.getDoc(u, id, 0)
 	if err != nil {
 		return err
@@ -349,11 +351,8 @@ func (c *Client) getDocWithReq(req *http.Request, id string, depth int) (*goquer
 	if err != nil {
 		return nil, fmt.Errorf("api: get request failed: %w", err)
 	}
-	if r.StatusCode == 502 {
-		return nil, errRetry
-	}
-	if r.StatusCode == 503 {
-		c.reset()
+	if r.StatusCode == 502 || r.StatusCode == 503 {
+		return nil, fmt.Errorf("api: %s: %w", r.Status, errRetry)
 	}
 	if r.StatusCode != 200 && r.StatusCode != 202 {
 		return nil, fmt.Errorf("api: invalid status code: %s", r.Status)
