@@ -143,119 +143,147 @@ func Run(ctx context.Context, captchaURL, proxy, token, dbPath string, admin int
 			return nil
 		case update = <-updates:
 		}
-		if update.Message == nil {
-			continue
-		}
+		var command string
+		var args string
+		var user int
 
-		// Print chat ID when added to a group or channel
-		bot.printChatID(update.Message)
-
-		user := int(update.Message.Chat.ID)
-		if _, ok := userChats[user]; !ok {
-			continue
-		}
-
-		// Launch search from link pasted
-		if id, ok := api.ItemID(update.Message.Text); ok {
-			parsed, err := parseArgs(id, userChats[user])
-			if err != nil {
-				bot.message(user, err.Error())
-			} else {
-				bot.searchs.Store(parsed.id, nil)
+		// Extract command from callback
+		if update.CallbackQuery != nil {
+			user = int(update.CallbackQuery.From.ID)
+			if _, err := bot.AnswerCallbackQuery(tgbot.NewCallback(update.CallbackQuery.ID, "")); err != nil {
+				bot.log(err)
+				continue
 			}
-			bot.message(user, fmt.Sprintf("searching %s", parsed.id))
+			split := strings.SplitN(update.CallbackQuery.Data, " ", 2)
+			command = strings.TrimPrefix(split[0], "/")
+			if len(split) > 1 {
+				args = split[1]
+			}
 		}
 
-		if update.Message.IsCommand() {
-			args := update.Message.CommandArguments()
-			switch update.Message.Command() {
-			case "chat":
-				if args == "" {
-					bot.message(user, fmt.Sprintf("current chat id for searchs: %s", userChats[user]))
-					break
-				}
-				userChats[user] = args
-				if err := db.Put("config", strconv.Itoa(user), args); err != nil {
-					bot.log(fmt.Errorf("couldn't get config for %d: %w", u, err))
-				}
-				bot.message(user, fmt.Sprintf("chat id for searchs updated: %s", args))
-			case "search":
-				if args == "" {
-					bot.message(user, "search arguments not provided")
-					continue
-				}
-				parsed, err := parseArgs(args, userChats[user])
+		if update.Message != nil {
+			// Print chat ID when added to a group or channel
+			bot.printChatID(update.Message)
+
+			user = int(update.Message.Chat.ID)
+			if _, ok := userChats[user]; !ok {
+				continue
+			}
+
+			// Launch search from link pasted
+			if id, ok := api.ItemID(update.Message.Text); ok {
+				parsed, err := parseArgs(id, userChats[user])
 				if err != nil {
 					bot.message(user, err.Error())
 				} else {
 					bot.searchs.Store(parsed.id, nil)
 				}
 				bot.message(user, fmt.Sprintf("searching %s", parsed.id))
-			case "status":
-				all := false
-				if args == "*" {
-					all = true
-				}
-				bot.message(user, "status info:")
-				bot.searchs.Range(func(k interface{}, v interface{}) bool {
-					key := k.(string)
-					if !all {
-						prefix := fmt.Sprintf("%s/", userChats[user])
-						if !strings.HasPrefix(key, prefix) {
-							return true
-						}
-						key = strings.TrimPrefix(key, prefix)
+			}
+			if update.Message.IsCommand() {
+				command = update.Message.Command()
+				args = update.Message.CommandArguments()
+			}
+		}
+		if command == "" {
+			continue
+		}
+
+		switch command {
+		case "chat":
+			if args == "" {
+				bot.message(user, fmt.Sprintf("current chat id for searchs: %s", userChats[user]))
+				break
+			}
+			userChats[user] = args
+			if err := db.Put("config", strconv.Itoa(user), args); err != nil {
+				bot.log(fmt.Errorf("couldn't get config for %d: %w", u, err))
+			}
+			bot.message(user, fmt.Sprintf("chat id for searchs updated: %s", args))
+		case "search":
+			if args == "" {
+				bot.message(user, "search arguments not provided")
+				continue
+			}
+			parsed, err := parseArgs(args, userChats[user])
+			if err != nil {
+				bot.message(user, err.Error())
+			} else {
+				bot.searchs.Store(parsed.id, nil)
+			}
+			bot.message(user, fmt.Sprintf("searching %s", parsed.id))
+		case "status":
+			all := false
+			if args == "*" {
+				all = true
+			}
+			bot.message(user, "status info:")
+			bot.searchs.Range(func(k interface{}, v interface{}) bool {
+				key := k.(string)
+				if !all {
+					prefix := fmt.Sprintf("%s/", userChats[user])
+					if !strings.HasPrefix(key, prefix) {
+						return true
 					}
-					var link string
-					var min float64
-					var new float64
-					var used float64
-					if i, ok := v.(api.Item); ok {
-						link = i.Link
-						min = i.MinPrice
-						new = i.Prices[0]
-						for j := 1; j < 5; j++ {
-							if i.Prices[j] == 0 {
-								continue
-							}
-							if used == 0 || i.Prices[j] < used {
-								used = i.Prices[j]
-							}
+					key = strings.TrimPrefix(key, prefix)
+				}
+				var min float64
+				var new float64
+				var used float64
+				var title string
+				split := strings.Split(key, "/")
+				link := api.Link(split[len(split)-1])
+				if i, ok := v.(api.Item); ok {
+					link = i.Link
+					min = i.MinPrice
+					new = i.Prices[0]
+					title = i.Title
+					for j := 1; j < 5; j++ {
+						if i.Prices[j] == 0 {
+							continue
+						}
+						if used == 0 || i.Prices[j] < used {
+							used = i.Prices[j]
 						}
 					}
-					bot.messageOpts(user, fmt.Sprintf("running %s %s min:%.2f€, new:%.2f€, used:%.2f€", key, link, min, new, used), false)
-					return true
-				})
-				bot.log(fmt.Sprintf("elapsed: %s", bot.elapsed))
-			case "stop":
-				if args == "" {
-					bot.message(user, "stop arguments not provided")
-					continue
 				}
-				parsed, err := parseArgs(args, userChats[user])
+				btns := []tgbot.InlineKeyboardButton{
+					tgbot.NewInlineKeyboardButtonURL("link", link),
+					tgbot.NewInlineKeyboardButtonData("stop", fmt.Sprintf("/stop %s", key)),
+				}
+
+				bot.messageOpts(user, fmt.Sprintf("%s %s\nmin:%.2f€, new:%.2f€, used:%.2f€", key, title, min, new, used), false, btns)
+				return true
+			})
+			bot.log(fmt.Sprintf("elapsed: %s", bot.elapsed))
+		case "stop":
+			if args == "" {
+				bot.message(user, "stop arguments not provided")
+				continue
+			}
+			parsed, err := parseArgs(args, userChats[user])
+			if err != nil {
+				bot.message(user, err.Error())
+			}
+			if parsed.query == "*" {
+				bot.stopAll()
+				bot.message(user, "stopped all")
+			} else {
+				bot.stop(parsed)
+				bot.message(user, fmt.Sprintf("stopped %s", parsed.id))
+			}
+		case "export":
+			bot.export(user)
+		case "batch":
+			split := strings.Split(args, "\n")
+			for _, s := range split {
+				parsed, err := parseArgs(s, userChats[user])
 				if err != nil {
 					bot.message(user, err.Error())
-				}
-				if parsed.query == "*" {
-					bot.stopAll()
-					bot.message(user, "stopped all")
 				} else {
-					bot.stop(parsed)
-					bot.message(user, fmt.Sprintf("stopped %s", parsed.id))
+					bot.searchs.Store(parsed.id, nil)
 				}
-			case "export":
-				bot.export(user)
-			case "batch":
-				split := strings.Split(args, "\n")
-				for _, s := range split {
-					parsed, err := parseArgs(s, userChats[user])
-					if err != nil {
-						bot.message(user, err.Error())
-					} else {
-						bot.searchs.Store(parsed.id, nil)
-					}
-					bot.message(user, fmt.Sprintf("searching %s", parsed.id))
-				}
+				bot.message(user, fmt.Sprintf("searching %s", parsed.id))
 			}
 		}
 	}
@@ -365,7 +393,7 @@ func (b *bot) export(user int) {
 	b.message(user, fmt.Sprintf("/batch %s", strings.Join(keys, "\n")))
 }
 
-func (b *bot) messageOpts(chat interface{}, text string, preview bool) {
+func (b *bot) messageOpts(chat interface{}, text string, preview bool, btns []tgbot.InlineKeyboardButton) {
 	var msg tgbot.MessageConfig
 	switch v := chat.(type) {
 	case string:
@@ -377,6 +405,9 @@ func (b *bot) messageOpts(chat interface{}, text string, preview bool) {
 	default:
 		b.log(fmt.Sprintf("invalid type for message: %T", chat))
 	}
+	if len(btns) > 0 {
+		msg.ReplyMarkup = tgbot.NewInlineKeyboardMarkup(btns)
+	}
 	msg.DisableWebPagePreview = true
 	if _, err := b.Send(msg); err != nil {
 		b.log(fmt.Errorf("couldn't send message to %v: %w", chat, err))
@@ -385,7 +416,7 @@ func (b *bot) messageOpts(chat interface{}, text string, preview bool) {
 }
 
 func (b *bot) message(chat interface{}, text string) {
-	b.messageOpts(chat, text, true)
+	b.messageOpts(chat, text, true, nil)
 }
 
 func (b *bot) printChatID(msg *tgbot.Message) {
