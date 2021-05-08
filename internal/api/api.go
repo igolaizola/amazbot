@@ -297,8 +297,10 @@ func (c *Client) search(id string, item *Item, callback func(Item, int) error) e
 	item.Link = link
 	item.Title = title
 	prevMin := item.MinPrice
+	var newMin bool
 	if item.MinPrice == 0 || prices[0] < item.MinPrice {
 		item.MinPrice = prices[0]
+		newMin = true
 	}
 	prev := item.Prices
 	for i, p := range prices {
@@ -318,12 +320,16 @@ func (c *Client) search(id string, item *Item, callback func(Item, int) error) e
 		if prevMin == 0 && i == 0 {
 			continue
 		}
+		// Skip new price if not a new min
+		if i == 0 && !newMin {
+		  continue
+		}
 		// Skip prices higher than previous ones
 		if prev[i] > 0 && p >= prev[i] {
 			continue
 		}
-		// Skip prices higher than min
-		if item.MinPrice > 0 && p >= item.MinPrice {
+		// Skip used prices higher than min
+		if i > 0 && item.MinPrice > 0 && p >= item.MinPrice {
 			continue
 		}
 		if err := callback(*item, i); err != nil {

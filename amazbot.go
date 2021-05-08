@@ -418,7 +418,7 @@ func (b *bot) messageOpts(chat interface{}, text string, preview bool, btns []tg
 	if len(btns) > 0 {
 		msg.ReplyMarkup = tgbot.NewInlineKeyboardMarkup(btns)
 	}
-	msg.DisableWebPagePreview = true
+	msg.DisableWebPagePreview = !preview
 	if _, err := b.Send(msg); err != nil {
 		b.log(fmt.Errorf("couldn't send message to %v: %w", chat, err))
 	}
