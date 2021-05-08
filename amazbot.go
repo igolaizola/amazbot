@@ -2,7 +2,6 @@ package amazbot
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"log"
 	"sort"
@@ -151,11 +150,10 @@ func Run(ctx context.Context, captchaURL, proxy, token, dbPath string, admin int
 		// Extract command from callback
 		if update.CallbackQuery != nil {
 			user = int(update.CallbackQuery.From.ID)
-			b, err := base64.URLEncoding.DecodeString(update.CallbackQuery.Data)
+			data := update.CallbackQuery.Data
 			if err != nil {
 				bot.log(err)
 			}
-			data := string(b)
 			if _, err := bot.AnswerCallbackQuery(tgbot.NewCallback(update.CallbackQuery.ID, "")); err != nil {
 				bot.log(err)
 				continue
@@ -178,10 +176,14 @@ func Run(ctx context.Context, captchaURL, proxy, token, dbPath string, admin int
 				parsed, err := parseArgs(id, userChats[user])
 				if err != nil {
 					bot.message(user, err.Error())
-				} else {
-					bot.searchs.Store(parsed.id, nil)
+					continue
 				}
-				bot.message(user, fmt.Sprintf("searching %s", parsed.id))
+				btns := []tgbot.InlineKeyboardButton{}
+				for i := 0; i < 5; i++ {
+					btns = append(btns, tgbot.NewInlineKeyboardButtonData(api.StateText("en", i), fmt.Sprintf("/search %s?%d", parsed.id, i)))
+				}
+				bot.messageOpts(user, "Select minimum product condition to search:", false, btns)
+				continue
 			}
 			if update.Message.IsCommand() {
 				command = update.Message.Command()
@@ -256,12 +258,10 @@ func Run(ctx context.Context, captchaURL, proxy, token, dbPath string, admin int
 						}
 					}
 				}
-				data := base64.URLEncoding.EncodeToString([]byte(fmt.Sprintf("/stop %s", key)))
 				btns := []tgbot.InlineKeyboardButton{
 					tgbot.NewInlineKeyboardButtonURL("link", link),
-					tgbot.NewInlineKeyboardButtonData("stop", data),
+					tgbot.NewInlineKeyboardButtonData("stop", fmt.Sprintf("/stop %s", key)),
 				}
-
 				bot.messageOpts(user, fmt.Sprintf("%s %s\nmin:%.2f€, new:%.2f€, used:%.2f€", key, title, min, new, used), false, btns)
 				return true
 			})
@@ -470,5 +470,5 @@ func textMessage(i api.Item, state int, chat string) string {
 	}
 
 	return fmt.Sprintf("♻️ REACONDICIONADO\n\n%s\n\n✅ Precio: %.2f€\n🚫 Nuevo: %.2f€\n🎁 Estado: %s\n\n🔗 %s%s",
-		i.Title, i.Prices[state], i.MinPrice, api.StateText(state), i.Link, bottom)
+		i.Title, i.Prices[state], i.MinPrice, api.StateText("es", state), i.Link, bottom)
 }

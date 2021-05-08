@@ -108,23 +108,32 @@ func Link(id string) string {
 	return fmt.Sprintf("https://www.amazon.es/dp/%s", id)
 }
 
-func StateText(s int) string {
-	switch s {
-	case 0:
-		return "Nuevo"
-	case 1:
-		return "Como nuevo"
-	case 2:
-		return "Muy bueno"
-	case 3:
-		return "Bueno"
-	case 4:
-		return "Aceptable"
+func StateText(lang string, s int) string {
+	mp := map[string][]string{
+		"es": {"Nuevo", "Como nuevo", "Muy bueno", "Aceptable"},
+		"en": {"New", "Like new", "Very good", "Good", "Acceptable"},
 	}
-	return ""
+	arr, ok := mp[lang]
+	if !ok {
+		return ""
+	}
+	if s < 0 || s >= len(arr) {
+		return ""
+	}
+	return arr[s]
 }
 
 func (c *Client) Search(id string, item *Item, callback func(Item, int) error) error {
+	split := strings.SplitN(id, "?", 2)
+	maxState := 4
+	if len(split) > 1 {
+		id = split[0]
+		var err error
+		maxState, err = strconv.Atoi(split[1])
+		if err != nil {
+			return fmt.Errorf("api: couldn't parse max state: %s", split[1])
+		}
+	}
 	var retry bool
 	for {
 		select {
@@ -132,7 +141,7 @@ func (c *Client) Search(id string, item *Item, callback func(Item, int) error) e
 			return nil
 		default:
 		}
-		err := c.search(id, item, callback)
+		err := c.search(id, maxState, item, callback)
 		var netErr net.Error
 		if errors.As(err, &netErr) && netErr.Timeout() {
 			continue
@@ -151,7 +160,7 @@ func (c *Client) Search(id string, item *Item, callback func(Item, int) error) e
 
 var errRetry = errors.New("retriable error")
 
-func (c *Client) search(id string, item *Item, callback func(Item, int) error) error {
+func (c *Client) search(id string, maxState int, item *Item, callback func(Item, int) error) error {
 	if item == nil {
 		return fmt.Errorf("api: item is nil")
 	}
@@ -309,7 +318,7 @@ func (c *Client) search(id string, item *Item, callback func(Item, int) error) e
 	item.Prices = prices
 	for i, p := range prices {
 		// TODO(igolaizola): disabled some states
-		if i > 1 {
+		if i > maxState {
 			break
 		}
 		// Price not found, continue
