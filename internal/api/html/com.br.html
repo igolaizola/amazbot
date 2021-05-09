@@ -1,0 +1,5356 @@
+<html><head><script type="a-state" data-a-state="{&quot;key&quot;:&quot;aod-b2b-enabled&quot;}">{"isB2bLayoutChangesEnabled":false}</script>
+
+
+
+
+
+
+
+
+</head><body><span class="a-declarative" data-action="aod-close-on-esc-action" data-aod-close-on-esc-action="{}">
+<div id="aod-close" class="a-section a-spacing-none a-padding-none">
+<span class="a-declarative" data-action="close-all-offers-display" data-close-all-offers-display="{}">
+<span tabindex="0">
+<i class="a-icon a-icon-close a-icon-medium aod-close-button" role="img" aria-label="aod-close"></i>
+</span>
+</span>
+</div>
+
+<span class="a-declarative" data-action="aod-close-filter-on-click-outside-filter" data-aod-close-filter-on-click-outside-filter="{}">
+<span tabindex="0" class="aod-div-for-focus">
+<div id="all-offers-display-scroller" class="a-scroller a-scroller-vertical">
+
+<div id="aod-container" class="a-section a-spacing-none a-padding-none">
+<form method="post" action="" class="aod-hide a-spacing-none"></form>
+
+<div id="aod-sticky-pinned-container" class="a-section a-spacing-none aod-sticky-pinned-container">
+<div id="aod-sticky-pinned-offer" class="a-section a-spacing-none aod-sticky-pinned-offer">
+
+
+
+<div class="a-section a-spacing-medium a-spacing-top-medium aod-information-block">
+<span class="a-declarative" data-action="aod-pinned-offer-scroll-top" data-aod-pinned-offer-scroll-top="{}">
+<div class="a-row a-spacing-none">
+<div id="pinned-de-id" class="a-column a-span12 a-spacing-none pinned-offer-block a-span-last">
+
+
+<div id="aod-offer-heading" class="a-section a-spacing-none a-padding-none aod-clear-float">
+
+
+
+
+
+
+
+
+
+
+<h5>
+
+
+Novo
+
+
+
+
+</h5>
+
+
+
+</div>
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<div id="pinned-offer-scroll-id" class="a-section a-spacing-none">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-price-0" class="a-section a-spacing-none a-padding-none">
+<span class="a-price" data-a-size="l" data-a-color="base"><span class="a-offscreen">R$214,99</span><span aria-hidden="true"><span class="a-price-symbol">R$</span><span class="a-price-whole">214<span class="a-price-decimal">,</span></span><span class="a-price-fraction">99</span></span></span>
+</div>
+
+
+
+
+
+
+
+
+
+
+</div>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+<div class="a-fixed-right-grid"><div class="a-fixed-right-grid-inner" style="padding-right:150px">
+<div class="a-fixed-right-grid-col aod-padding-right-10 a-col-left" style="padding-right:0%;float:left;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-bottlingDepositFee-0" class="a-row">
+
+</div>
+
+
+
+
+
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-promotion-0" class="a-section a-spacing-none a-padding-none">
+
+
+    
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="a-row aod-ship-charge">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+<div class="a-row aod-delivery-promise">
+<div class="a-column a-span12 aod-delivery-promise-column">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="dynamicDeliveryMessage" class="a-section a-spacing-mini a-spacing-top-mini">
+
+
+
+<div id="ddmDeliveryMessage" class="a-section a-spacing-mini">
+
+
+
+
+
+
+
+
+
+R$15,00 de frete. Entrega: <b> 19 - 21 de Mai </b>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+<input type="hidden" id="ddmSelectAsin" value="B07FCMKK5X">
+
+
+<input type="hidden" id="ddmSelectMerchant" value="A1GFFZXS7IVMF4">
+
+
+<input type="hidden" id="ddmSelectPreselectedMerchant" value="A1GFFZXS7IVMF4">
+
+
+
+
+<script type="text/javascript">
+P.when("A", "jQuery").execute(function(A, $) {
+$("#selectQuantity [name='quantity'], #mobileQuantityDropDown").live("change", function (event) {
+if (event.updateDDMOnQuantityChange) {
+return;
+}
+event.updateDDMOnQuantityChange = 1;
+// "#buybox" is included in this list because if there is no accordion row, then it is a single-offer layout
+var accordionRow = $(this).closest('[id$="AccordionRow"], #buybox');
+var quantity = $(this).val();
+var asin = accordionRow.find("#ddmSelectAsin").val();
+var deviceType = "web";
+if (!asin || !quantity) {
+return;
+}
+var canReload = false;
+if (typeof sbrContext !== 'undefined') {
+canReload = sbrContext.sbrBehavior && sbrContext.sbrBehavior.reloadPageWhenBBWinnerChange;
+}
+var merchantId = "";
+var preselectedMerchantId = "";
+if(canReload) {
+preselectedMerchantId = accordionRow.find("#ddmSelectPreselectedMerchant").val();
+} else {
+merchantId = accordionRow.find("#ddmSelectMerchant").val();
+}
+$.ajax({
+type: "POST",
+url: "/gp/product/features/dynamic-delivery-message/udp-ajax-handler/get-delivery-message.html?_encoding=UTF-8",
+contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+data: {
+"asin": asin,
+"deviceType": deviceType,
+"merchantId": merchantId,
+"preselectedMerchantId": preselectedMerchantId,
+"quantity": quantity
+},
+accordionRow: accordionRow,
+dataType: "html",
+success: function(objResponse) {
+if (objResponse != null && objResponse != "") {
+accordionRow.find("#dynamicDeliveryMessage").replaceWith(objResponse);
+}
+}
+});
+});
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<span class="a-size-base aod-delivery-more aok-hidden">...
+<span class="a-declarative" data-action="aod-delivery-more-action" data-aod-delivery-more-action="{}" id="aod-delivery-more-action">
+<a aria-label="Mais. sobre a entrega" class="a-link-normal aod-delivery-morelink" href="#">Mais</a>
+</span>
+</span>
+</div>
+
+
+
+
+
+
+
+</div>
+<div class="a-fixed-right-grid-col aod-atc-column a-col-right" style="width:150px;margin-right:-150px;float:left;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<form method="post" action="/gp/add-to-cart/html/ref=aod_dpdsk_new_0" class="aod-atc-form-header-desktop a-spacing-none">
+
+
+
+
+<input type="hidden" name="session-id" value="142-6330422-1678217">
+<input type="hidden" name="qid">
+<input type="hidden" name="sr">
+
+
+
+<input type="hidden" name="signInToHUC" value="0" id="signInToHUC">
+
+
+<input type="hidden" name="metric-asin.B07FCMKK5X" value="1">
+<input type="hidden" name="registryItemID.1">
+<input type="hidden" name="registryID.1">
+<input type="hidden" name="itemCount" value="1">
+
+
+<input type="hidden" name="offeringID.1" value="sNK1cg5L7qm35Rk0G0xmCX95SvlVYCtzAFFt%2FFUm2FfyWsqVDyY2JrW5bKilCoBDPqjaOxbv8UQKGNbZ5Sl82CQ0CB0Wmkn8HbDyTxCKV%2FywJkKJQ2pN5tfhm6OFXTov16SdW0O8SZBLqq0WhASjQ7TuCop7tE1%2FxkLd8Xk3OsI9AovWEHj5I%2BD6L7l48jcb">
+<input type="hidden" name="quantity.1" value="1">
+
+<input type="hidden" name="isAddon" value="1">
+
+
+
+
+
+
+
+
+<span class="a-declarative" data-action="aod-click-log" data-aod-click-log="{&quot;subtype&quot;:&quot;main&quot;,&quot;type&quot;:&quot;addToCart&quot;}">
+<span id="a-autoid-2" class="a-button a-button-primary aod-atc-generic-btn-desktop"><span class="a-button-inner"><input name="submit.addToCart" aria-label="Adicionar ao carrinho do vendedor AMZ BAZAR e preço R$214,99
+" aria-labelledby="" class="a-button-input" type="submit"><span id="a-autoid-2-announce" class="a-button-text" aria-hidden="true">
+Adicionar ao Carrinho
+</span></span></span>
+</span>
+
+
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+</div></div>
+<div id="aod-pinned-offer-main-content-show-more" class="a-section a-spacing-none a-padding-none aod-clear-float">
+<span class="a-declarative" data-action="aod-sticky-pinned-offer-show-more" data-aod-sticky-pinned-offer-show-more="{}">
+<a id="aod-sticky-pinned-offer-show-more-link" class="a-link-normal" title="Show more" href="#">
+<i class="a-icon a-icon-arrow-up a-icon-mini aod-arrow-low" role="presentation"></i>
+Ver mais
+</a>
+</span>
+</div>
+<div id="aod-sticky-pinned-offer-additional-content" class="a-section a-spacing-none a-spacing-top-small a-padding-none aod-hide">
+<hr aria-hidden="true" class="a-spacing-small a-spacing-top-small a-divider-normal aod-condition-divider">
+<div class="a-row">
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-shipsFrom" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Enviado pela</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+
+<span class="a-size-small a-color-base">AMZ BAZAR</span>
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+</div>
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-soldBy" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Vendido por</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+
+
+<a aria-label="Abre uma nova página" class="a-size-small a-link-normal" target="_blank" rel="noopener" href="/gp/aag/main?ie=UTF8&amp;seller=A1GFFZXS7IVMF4&amp;isAmazonFulfilled=0&amp;asin=B07FCMKK5X&amp;ref_=olp_merch_name_0" role="link">
+AMZ BAZAR</a>
+
+
+
+<div id="aod-offer-seller-rating" class="a-section a-spacing-none a-padding-none">
+
+<i class="a-icon a-icon-star-mini a-star-mini-4-5 aod-seller-rating-count-class"></i>
+
+<span id="seller-rating-count-{iter}" class="a-size-small a-color-base">
+
+<span>(331 classificações)<br>89% positivo nos últimos 12 meses</span>
+
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a class="a-size-small a-link-normal" target="_blank" rel="noopener" href="/gp/aag/main?ie=UTF8&amp;seller=A1GFFZXS7IVMF4&amp;isAmazonFulfilled=0&amp;asin=B07FCMKK5X&amp;sshmPath=returns&amp;ref_=olp_merch_name_0" role="link">política de devoluções</a>
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+</div>
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+</div>
+<div class="a-section aod-offer-divider aod-clear-float"></div>
+</div>
+<div id="aod-pinned-offer-main-content-show-less" class="a-section a-spacing-top-micro aod-clear-float">
+<span class="a-declarative" data-action="aod-sticky-pinned-offer-show-less" data-aod-sticky-pinned-offer-show-less="{}">
+<a id="aod-sticky-pinned-offer-show-less-link" class="a-link-normal aod-hide" title="Show less" href="#">
+<i class="a-icon a-icon-arrow-up a-icon-mini aod-arrow-up" role="presentation"></i>
+Ver menos
+</a>
+</span>
+</div>
+
+
+
+</div>
+</div>
+</span>
+</div>
+<hr aria-hidden="true" class="a-spacing-none a-divider-normal aod-offer-block-divider">
+</div>
+</div>
+
+
+
+<div id="aod-pinned-offer" class="a-section a-spacing-none aod-pinned-offer">
+<div class="a-section a-spacing-none asin-container-padding aod-clear-float">
+<div class="a-fixed-left-grid pinned-offer-inner"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div id="pinned-image-id" class="a-fixed-left-grid-col offer-image-block aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+
+
+
+<img alt="" src="https://images-na.ssl-images-amazon.com/images/I/41O4rjSlneL.jpg" id="aod-asin-image-id">
+
+
+</div>
+<div id="pinned-de-id" class="a-fixed-left-grid-col pinned-offer-block a-col-right" style="padding-left:0%;float:left;">
+
+
+
+
+<div id="aod-asin-block-asin" class="a-section a-spacing-none">
+<div id="aod-asin-title" class="a-row">
+
+
+
+<h5 id="aod-asin-title-text" class="aod-asin-title-text-class">
+SanDisk Cartão de memória 128 GB Extreme microSDXC UHS-I com adaptador - C10, U3, V30, 4K, A2, Micro SD - SDSQXA1-128G-GN6MA
+</h5>
+
+
+
+</div>
+
+<div id="aod-asin-reviews" class="a-row">
+
+<span>
+<i id="aod-asin-reviews-star" class="a-icon a-icon-star a-star-4-5"></i>
+</span>
+
+<span id="aod-asin-reviews-block">
+<span id="aod-asin-reviews-count-title" class="a-size-small a-color-base aod-asin-reviews-block-class">
+202.381 classificações
+</span>
+</span>
+</div>
+
+
+</div>
+
+
+
+<div id="aod-offer-heading" class="a-section a-spacing-none a-padding-none aod-clear-float">
+
+
+
+
+
+
+
+
+
+
+<h5>
+
+
+Novo
+
+
+
+
+</h5>
+
+
+
+</div>
+<div class="a-fixed-right-grid"><div class="a-fixed-right-grid-inner" style="padding-right:150px">
+<div class="a-fixed-right-grid-col aod-padding-right-10 a-col-left" style="padding-right:0%;float:left;">
+<div id="pinned-offer-top-id" class="a-section a-spacing-none">
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-price-0" class="a-section a-spacing-none a-padding-none">
+<span class="a-price" data-a-size="l" data-a-color="base"><span class="a-offscreen">R$214,99</span><span aria-hidden="true"><span class="a-price-symbol">R$</span><span class="a-price-whole">214<span class="a-price-decimal">,</span></span><span class="a-price-fraction">99</span></span></span>
+</div>
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-bottlingDepositFee-0" class="a-row">
+
+</div>
+
+
+
+
+
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-promotion-0" class="a-section a-spacing-none a-padding-none">
+
+
+    
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="a-row aod-ship-charge">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+<div class="a-row aod-delivery-promise">
+<div class="a-column a-span12 aod-delivery-promise-column">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="dynamicDeliveryMessage" class="a-section a-spacing-mini a-spacing-top-mini">
+
+
+
+<div id="ddmDeliveryMessage" class="a-section a-spacing-mini">
+
+
+
+
+
+
+
+
+
+R$15,00 de frete. Entrega: <b> 19 - 21 de Mai </b>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+<input type="hidden" id="ddmSelectAsin" value="B07FCMKK5X">
+
+
+<input type="hidden" id="ddmSelectMerchant" value="A1GFFZXS7IVMF4">
+
+
+<input type="hidden" id="ddmSelectPreselectedMerchant" value="A1GFFZXS7IVMF4">
+
+
+
+
+<script type="text/javascript">
+P.when("A", "jQuery").execute(function(A, $) {
+$("#selectQuantity [name='quantity'], #mobileQuantityDropDown").live("change", function (event) {
+if (event.updateDDMOnQuantityChange) {
+return;
+}
+event.updateDDMOnQuantityChange = 1;
+// "#buybox" is included in this list because if there is no accordion row, then it is a single-offer layout
+var accordionRow = $(this).closest('[id$="AccordionRow"], #buybox');
+var quantity = $(this).val();
+var asin = accordionRow.find("#ddmSelectAsin").val();
+var deviceType = "web";
+if (!asin || !quantity) {
+return;
+}
+var canReload = false;
+if (typeof sbrContext !== 'undefined') {
+canReload = sbrContext.sbrBehavior && sbrContext.sbrBehavior.reloadPageWhenBBWinnerChange;
+}
+var merchantId = "";
+var preselectedMerchantId = "";
+if(canReload) {
+preselectedMerchantId = accordionRow.find("#ddmSelectPreselectedMerchant").val();
+} else {
+merchantId = accordionRow.find("#ddmSelectMerchant").val();
+}
+$.ajax({
+type: "POST",
+url: "/gp/product/features/dynamic-delivery-message/udp-ajax-handler/get-delivery-message.html?_encoding=UTF-8",
+contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+data: {
+"asin": asin,
+"deviceType": deviceType,
+"merchantId": merchantId,
+"preselectedMerchantId": preselectedMerchantId,
+"quantity": quantity
+},
+accordionRow: accordionRow,
+dataType: "html",
+success: function(objResponse) {
+if (objResponse != null && objResponse != "") {
+accordionRow.find("#dynamicDeliveryMessage").replaceWith(objResponse);
+}
+}
+});
+});
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<span class="a-size-base aod-delivery-more aok-hidden">...
+<span class="a-declarative" data-action="aod-delivery-more-action" data-aod-delivery-more-action="{}" id="aod-delivery-more-action">
+<a aria-label="Mais. sobre a entrega" class="a-link-normal aod-delivery-morelink" href="#">Mais</a>
+</span>
+</span>
+</div>
+
+
+
+
+
+
+
+</div>
+</div>
+</div>
+<div class="a-fixed-right-grid-col aod-atc-column a-col-right" style="width:150px;margin-right:-150px;float:left;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<form method="post" action="/gp/add-to-cart/html/ref=aod_dpdsk_new_0" class="aod-atc-form-header-desktop a-spacing-none">
+
+
+
+
+<input type="hidden" name="session-id" value="142-6330422-1678217">
+<input type="hidden" name="qid">
+<input type="hidden" name="sr">
+
+
+
+<input type="hidden" name="signInToHUC" value="0" id="signInToHUC">
+
+
+<input type="hidden" name="metric-asin.B07FCMKK5X" value="1">
+<input type="hidden" name="registryItemID.1">
+<input type="hidden" name="registryID.1">
+<input type="hidden" name="itemCount" value="1">
+
+
+<input type="hidden" name="offeringID.1" value="sNK1cg5L7qm35Rk0G0xmCX95SvlVYCtzAFFt%2FFUm2FfyWsqVDyY2JrW5bKilCoBDPqjaOxbv8UQKGNbZ5Sl82CQ0CB0Wmkn8HbDyTxCKV%2FywJkKJQ2pN5tfhm6OFXTov16SdW0O8SZBLqq0WhASjQ7TuCop7tE1%2FxkLd8Xk3OsI9AovWEHj5I%2BD6L7l48jcb">
+<input type="hidden" name="quantity.1" value="1">
+
+<input type="hidden" name="isAddon" value="1">
+
+
+
+
+
+
+
+
+<span class="a-declarative" data-action="aod-click-log" data-aod-click-log="{&quot;subtype&quot;:&quot;main&quot;,&quot;type&quot;:&quot;addToCart&quot;}">
+<span id="a-autoid-2" class="a-button a-button-primary aod-atc-generic-btn-desktop"><span class="a-button-inner"><input name="submit.addToCart" aria-label="Adicionar ao carrinho do vendedor AMZ BAZAR e preço R$214,99
+" aria-labelledby="" class="a-button-input" type="submit"><span id="a-autoid-2-announce" class="a-button-text" aria-hidden="true">
+Adicionar ao Carrinho
+</span></span></span>
+</span>
+
+
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+
+</div>
+</div></div>
+
+<div id="aod-pinned-offer-main-content-show-more" class="a-section a-spacing-none a-padding-none aod-clear-float">
+<span class="a-declarative" data-action="aod-pinned-offer-show-more" data-aod-pinned-offer-show-more="{}">
+<a id="aod-pinned-offer-show-more-link" aria-label="Sobre os detalhes desta opção." class="a-link-normal" title="Show more" href="#">
+<i class="a-icon a-icon-arrow-up a-icon-mini aod-arrow-low" role="img" aria-label="Sobre os detalhes desta opção."></i>
+Ver mais
+</a>
+</span>
+</div>
+<div id="aod-pinned-offer-additional-content" class="a-section a-spacing-none a-spacing-top-small a-padding-none aod-hide">
+<hr aria-hidden="true" class="a-spacing-small a-spacing-top-small a-divider-normal aod-condition-divider">
+<div class="a-row">
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-shipsFrom" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Enviado pela</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+
+<span class="a-size-small a-color-base">AMZ BAZAR</span>
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+</div>
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-soldBy" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Vendido por</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+
+
+<a aria-label="Abre uma nova página" class="a-size-small a-link-normal" target="_blank" rel="noopener" href="/gp/aag/main?ie=UTF8&amp;seller=A1GFFZXS7IVMF4&amp;isAmazonFulfilled=0&amp;asin=B07FCMKK5X&amp;ref_=olp_merch_name_0" role="link">
+AMZ BAZAR</a>
+
+
+
+<div id="aod-offer-seller-rating" class="a-section a-spacing-none a-padding-none">
+
+<i class="a-icon a-icon-star-mini a-star-mini-4-5 aod-seller-rating-count-class"></i>
+
+<span id="seller-rating-count-{iter}" class="a-size-small a-color-base">
+
+<span>(331 classificações)<br>89% positivo nos últimos 12 meses</span>
+
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a class="a-size-small a-link-normal" target="_blank" rel="noopener" href="/gp/aag/main?ie=UTF8&amp;seller=A1GFFZXS7IVMF4&amp;isAmazonFulfilled=0&amp;asin=B07FCMKK5X&amp;sshmPath=returns&amp;ref_=olp_merch_name_0" role="link">política de devoluções</a>
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+</div>
+<div class="a-column a-span12 a-spacing-none a-span-last">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+</div>
+<div class="a-section aod-offer-divider aod-clear-float"></div>
+</div>
+<div id="aod-pinned-offer-main-content-show-less" class="a-section a-spacing-top-micro aod-clear-float">
+<span class="a-declarative" data-action="aod-pinned-offer-show-less" data-aod-pinned-offer-show-less="{}">
+<a id="aod-pinned-offer-show-less-link" class="a-link-normal aod-hide" title="Show less" href="#">
+<i class="a-icon a-icon-arrow-up a-icon-mini aod-arrow-up" role="presentation"></i>
+Ver menos
+</a>
+</span>
+</div>
+
+</div>
+<hr aria-hidden="true" class="a-spacing-none a-divider-normal aod-offer-block-divider">
+</div>
+
+
+
+
+
+<div id="aod-filter" class="a-section aod-filter-block-container aod-no-select">
+<div class="a-row">
+<div id="aod-message-component" class="a-column a-span9">
+<span id="aod-filter-offer-count-string" class="a-text-bold">5 outras opções</span><br>
+
+<span id="aod-sort-details-string">ordenado por menor preço + entrega</span>
+
+</div>
+</div>
+<span class="a-declarative" data-action="aod-filter-container-hover" data-aod-filter-container-hover="{}">
+<div id="aod-filter-component" class="a-section a-spacing-none a-padding-none aod-filter-component-container">
+<span class="a-declarative" data-action="aod-show-filter-action" data-aod-show-filter-action="{}">
+<span tabindex="0">
+<div class="a-section a-spacing-none a-padding-none">
+<span class="a-button a-button-dropdown a-button-base aod-filter-button-div">
+<span class="a-button-inner aod-filter-button-div">
+<i id="aod-filter-show" class="a-icon a-icon-dropdown a-icon-medium" role="img" aria-label="Filter Dropdown Show"></i>
+<i id="aod-filter-hide" class="a-icon a-icon-dropdown a-icon-medium" role="img" aria-label="Filter Dropdown Hide"></i>
+<span id="aod-filter-string" aria-hidden="true" class="a-button-text">Filtrar</span>
+</span>
+</span>
+</div>
+</span>
+</span>
+<input type="hidden" name="" value="Filtrar" id="aod-filter-count-string">
+<div id="aod-filter-list" class="a-section aod-filter-list-container">
+<div class="a-row">
+<div class="a-column a-span7">
+<h1 class="a-size-base a-text-bold">Filtrar por</h1>
+</div>
+<div class="a-column a-span5 aod-clear-all-div a-span-last">
+<span class="a-declarative" data-action="aod-filter-clear-all" data-aod-filter-clear-all="{}">
+<a class="a-link-normal" href="#">Apagar tudo</a>
+</span>
+</div>
+</div>
+<div class="a-row">
+<div class="a-column a-span12 a-span-last">
+<hr aria-hidden="true" class="a-spacing-none a-spacing-top-base a-divider-normal">
+</div>
+</div>
+
+
+
+<div class="a-row">
+<div class="a-column a-span12 a-span-last">
+<h1 class="a-size-base a-spacing-top-base a-text-bold">
+Entrega
+</h1>
+</div>
+</div>
+
+
+<div class="a-row aod-filter-parent-filter">
+
+
+
+
+
+
+
+<div class="a-column a-span12 a-spacing-top-small checkbox-container a-span-last">
+
+
+
+
+
+
+
+<div class="a-row">
+<span class="a-declarative" data-action="aod-toggle-filter-checkbox" data-aod-toggle-filter-checkbox="{&quot;refMarker&quot;:&quot;aod_f_primeEligible&quot;,&quot;checkboxID&quot;:&quot;primeEligible&quot;,&quot;parentID&quot;:&quot;&quot;}">
+<div class="a-column a-span9">
+<span class="a-size-base a-color-base"><i class="a-icon a-icon-prime" role="img" aria-label="Primeiro"></i></span>
+</div>
+<div id="primeEligible" class="a-column a-span3 aod-filter-checkbox a-span-last">
+<div class="a-checkbox a-checkbox-fancy aod-checkbox-col"><label><input type="checkbox" name="" value=""><i class="a-icon a-icon-checkbox"></i><span class="a-label a-checkbox-label"></span></label></div>
+</div>
+</span>
+</div>
+
+</div>
+</div>
+
+
+<div class="a-row aod-filter-parent-filter">
+
+
+
+
+
+
+
+<div class="a-column a-span12 a-spacing-top-small checkbox-container a-span-last">
+
+
+
+
+
+
+
+<div class="a-row">
+<span class="a-declarative" data-action="aod-toggle-filter-checkbox" data-aod-toggle-filter-checkbox="{&quot;refMarker&quot;:&quot;aod_f_freeShipping&quot;,&quot;checkboxID&quot;:&quot;freeShipping&quot;,&quot;parentID&quot;:&quot;&quot;}">
+<div class="a-column a-span9">
+<span class="a-size-base a-color-base">Elegível para frete grátis</span>
+</div>
+<div id="freeShipping" class="a-column a-span3 aod-filter-checkbox a-span-last">
+<div class="a-checkbox a-checkbox-fancy aod-checkbox-col"><label><input type="checkbox" name="" value=""><i class="a-icon a-icon-checkbox"></i><span class="a-label a-checkbox-label"></span></label></div>
+</div>
+</span>
+</div>
+
+</div>
+</div>
+
+
+
+
+<div class="a-row">
+<div class="a-column a-span12 a-span-last">
+<h1 class="a-size-base a-spacing-top-base a-text-bold">
+Condições do produto
+</h1>
+</div>
+</div>
+
+
+<div class="a-row aod-filter-parent-filter">
+
+
+
+
+
+
+
+<div class="a-column a-span12 a-spacing-top-small checkbox-container a-span-last">
+
+
+
+
+
+
+
+<div class="a-row">
+<span class="a-declarative" data-action="aod-toggle-filter-checkbox" data-aod-toggle-filter-checkbox="{&quot;refMarker&quot;:&quot;aod_f_new&quot;,&quot;checkboxID&quot;:&quot;new&quot;,&quot;parentID&quot;:&quot;&quot;}">
+<div class="a-column a-span9">
+<span class="a-size-base a-color-base">Novo</span>
+</div>
+<div id="new" class="a-column a-span3 aod-filter-checkbox a-span-last">
+<div class="a-checkbox a-checkbox-fancy aod-checkbox-col"><label><input type="checkbox" name="" value=""><i class="a-icon a-icon-checkbox"></i><span class="a-label a-checkbox-label"></span></label></div>
+</div>
+</span>
+</div>
+
+</div>
+</div>
+
+
+
+</div>
+</div>
+</span>
+
+<div id="aod-filter-swatch-box" class="a-section a-spacing-none a-spacing-top-base a-padding-none aod-hide">
+<div id="aod-filter-swatch-container-top" class="a-section a-spacing-none a-padding-none aod-filter-swatch-container">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-swatch-id-primeEligible" class="a-section a-spacing-none a-padding-none aod-filter-swatch">
+<span class="a-declarative" data-action="aod-toggle-filter-checkbox" data-aod-toggle-filter-checkbox="{&quot;refMarker&quot;:&quot;aod_f_primeEligible&quot;,&quot;checkboxID&quot;:&quot;primeEligible&quot;,&quot;parentID&quot;:&quot;&quot;}">
+<span class="a-declarative" data-action="aod-filter-swatch-hover" data-aod-filter-swatch-hover="{}">
+<div class="a-box a-spacing-none a-box-normal a-color-base-background"><div class="a-box-inner a-padding-none">
+<span tabindex="0">
+<div class="a-section a-spacing-none a-padding-none aod-filter-swatch-content">
+<span class="a-size-mini a-color-base aod-filter-swatch-content-text"><i class="a-icon a-icon-prime a-icon-small" role="img" aria-label="Primeiro"></i></span>
+<i class="a-icon a-icon-close a-icon-small" role="presentation"></i>
+</div>
+</span>
+</div></div>
+</span>
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-swatch-id-freeShipping" class="a-section a-spacing-none a-padding-none aod-filter-swatch">
+<span class="a-declarative" data-action="aod-toggle-filter-checkbox" data-aod-toggle-filter-checkbox="{&quot;refMarker&quot;:&quot;aod_f_freeShipping&quot;,&quot;checkboxID&quot;:&quot;freeShipping&quot;,&quot;parentID&quot;:&quot;&quot;}">
+<span class="a-declarative" data-action="aod-filter-swatch-hover" data-aod-filter-swatch-hover="{}">
+<div class="a-box a-spacing-none a-box-normal a-color-base-background"><div class="a-box-inner a-padding-none">
+<span tabindex="0">
+<div class="a-section a-spacing-none a-padding-none aod-filter-swatch-content">
+<span class="a-size-mini a-color-base aod-filter-swatch-content-text">Elegível para frete grátis</span>
+<i class="a-icon a-icon-close a-icon-small" role="presentation"></i>
+</div>
+</span>
+</div></div>
+</span>
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-swatch-id-new" class="a-section a-spacing-none a-padding-none aod-filter-swatch">
+<span class="a-declarative" data-action="aod-toggle-filter-checkbox" data-aod-toggle-filter-checkbox="{&quot;refMarker&quot;:&quot;aod_f_new&quot;,&quot;checkboxID&quot;:&quot;new&quot;,&quot;parentID&quot;:&quot;&quot;}">
+<span class="a-declarative" data-action="aod-filter-swatch-hover" data-aod-filter-swatch-hover="{}">
+<div class="a-box a-spacing-none a-box-normal a-color-base-background"><div class="a-box-inner a-padding-none">
+<span tabindex="0">
+<div class="a-section a-spacing-none a-padding-none aod-filter-swatch-content">
+<span class="a-size-mini a-color-base aod-filter-swatch-content-text">Novo</span>
+<i class="a-icon a-icon-close a-icon-small" role="presentation"></i>
+</div>
+</span>
+</div></div>
+</span>
+</span>
+</div>
+
+
+
+
+
+
+<div id="aod-filter-swatch-box-expand-div" class="a-section a-spacing-none a-padding-none aod-filter-swatch-box-text-div">
+<span class="a-declarative" data-action="aod-filter-swatch-expand" data-aod-filter-swatch-expand="{}">
+<a id="aod-filter-swatch-expand-link" class="a-size-small a-link-normal" href="#"></a>
+<a aria-label="filtros selecionados adicionais." class="a-link-normal" href="#"></a>
+</span>
+</div>
+<div id="aod-filter-swatch-box-clear-all-div" class="a-section a-spacing-none a-padding-none aod-filter-swatch-box-text-div">
+<span class="a-declarative" data-action="aod-filter-clear-all" data-aod-filter-clear-all="{}">
+<a aria-label="filtros selecionados." class="a-size-small a-link-normal" href="#">Apagar tudo</a>
+</span>
+</div>
+</div>
+<div id="aod-filter-swatch-container-bottom" class="a-section a-spacing-none a-padding-none aod-filter-swatch-container">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-swatch-id-primeEligible" class="a-section a-spacing-none a-padding-none aod-filter-swatch">
+<span class="a-declarative" data-action="aod-toggle-filter-checkbox" data-aod-toggle-filter-checkbox="{&quot;refMarker&quot;:&quot;aod_f_primeEligible&quot;,&quot;checkboxID&quot;:&quot;primeEligible&quot;,&quot;parentID&quot;:&quot;&quot;}">
+<span class="a-declarative" data-action="aod-filter-swatch-hover" data-aod-filter-swatch-hover="{}">
+<div class="a-box a-spacing-none a-box-normal a-color-base-background"><div class="a-box-inner a-padding-none">
+<span tabindex="0">
+<div class="a-section a-spacing-none a-padding-none aod-filter-swatch-content">
+<span class="a-size-mini a-color-base aod-filter-swatch-content-text"><i class="a-icon a-icon-prime a-icon-small" role="img" aria-label="Primeiro"></i></span>
+<i class="a-icon a-icon-close a-icon-small" role="presentation"></i>
+</div>
+</span>
+</div></div>
+</span>
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-swatch-id-freeShipping" class="a-section a-spacing-none a-padding-none aod-filter-swatch">
+<span class="a-declarative" data-action="aod-toggle-filter-checkbox" data-aod-toggle-filter-checkbox="{&quot;refMarker&quot;:&quot;aod_f_freeShipping&quot;,&quot;checkboxID&quot;:&quot;freeShipping&quot;,&quot;parentID&quot;:&quot;&quot;}">
+<span class="a-declarative" data-action="aod-filter-swatch-hover" data-aod-filter-swatch-hover="{}">
+<div class="a-box a-spacing-none a-box-normal a-color-base-background"><div class="a-box-inner a-padding-none">
+<span tabindex="0">
+<div class="a-section a-spacing-none a-padding-none aod-filter-swatch-content">
+<span class="a-size-mini a-color-base aod-filter-swatch-content-text">Elegível para frete grátis</span>
+<i class="a-icon a-icon-close a-icon-small" role="presentation"></i>
+</div>
+</span>
+</div></div>
+</span>
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-swatch-id-new" class="a-section a-spacing-none a-padding-none aod-filter-swatch">
+<span class="a-declarative" data-action="aod-toggle-filter-checkbox" data-aod-toggle-filter-checkbox="{&quot;refMarker&quot;:&quot;aod_f_new&quot;,&quot;checkboxID&quot;:&quot;new&quot;,&quot;parentID&quot;:&quot;&quot;}">
+<span class="a-declarative" data-action="aod-filter-swatch-hover" data-aod-filter-swatch-hover="{}">
+<div class="a-box a-spacing-none a-box-normal a-color-base-background"><div class="a-box-inner a-padding-none">
+<span tabindex="0">
+<div class="a-section a-spacing-none a-padding-none aod-filter-swatch-content">
+<span class="a-size-mini a-color-base aod-filter-swatch-content-text">Novo</span>
+<i class="a-icon a-icon-close a-icon-small" role="presentation"></i>
+</div>
+</span>
+</div></div>
+</span>
+</span>
+</div>
+
+
+
+
+
+
+</div>
+</div>
+
+
+</div>
+
+
+
+
+<div id="aod-offer-list" class="a-section a-spacing-none a-padding-none">
+
+
+
+
+
+
+
+<input type="hidden" name="" value="5" id="aod-total-offer-count">
+
+
+<input type="hidden" name="" value="5 outras opções" id="aod-total-offer-count-string">
+
+
+
+
+
+<div id="aod-offer" class="a-section a-spacing-medium a-spacing-top-base a-padding-none aod-information-block aod-clear-float">
+<div id="aod-offer-heading" class="a-section a-spacing-none a-padding-none aod-clear-float">
+
+
+
+
+
+
+
+
+
+
+
+<h5>
+
+
+Novo
+
+
+
+
+</h5>
+
+
+
+</div>
+
+
+
+<div id="aod-offer-price" class="a-section a-spacing-none a-spacing-top-micro a-padding-none aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col a-col-left" style="width:165px;margin-left:-165px;float:left;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-price-1" class="a-section a-spacing-none a-padding-none">
+<span class="a-price" data-a-size="l" data-a-color="base"><span class="a-offscreen">R$164,00</span><span aria-hidden="true"><span class="a-price-symbol">R$</span><span class="a-price-whole">164<span class="a-price-decimal">,</span></span><span class="a-price-fraction">00</span></span></span>
+</div>
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+<div class="a-fixed-right-grid"><div class="a-fixed-right-grid-inner" style="padding-right:150px">
+<div class="a-fixed-right-grid-col aod-padding-right-10 a-col-left" style="padding-right:0%;float:left;">
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-bottlingDepositFee-1" class="a-row">
+
+</div>
+
+
+
+
+
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-promotion-1" class="a-section a-spacing-none a-padding-none">
+
+
+    
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="a-row aod-ship-charge">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+<div class="a-row aod-delivery-promise">
+<div class="a-column a-span12 aod-delivery-promise-column">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="dynamicDeliveryMessage" class="a-section a-spacing-mini a-spacing-top-mini">
+
+
+
+<div id="ddmDeliveryMessage" class="a-section a-spacing-mini">
+
+
+
+
+
+
+
+
+
+
+    
+    <a href="/gp/help/customer/display.html?ie=UTF8&amp;pop-up=1&amp;nodeId=201365600" target="AmazonHelp" onclick="return amz_js_PopWin(this.href,'AmazonHelp','width=550,height=550,resizable=1,scrollbars=1,toolbar=0,status=0');">Entrega com Frete GRÁTIS:</a> <b>
+
+
+24 de Mai - 2 de Jun
+
+</b>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+<input type="hidden" id="ddmSelectAsin" value="B07FCMKK5X">
+
+
+<input type="hidden" id="ddmSelectMerchant" value="A1ZZFT5FULY4LN">
+
+
+<input type="hidden" id="ddmSelectPreselectedMerchant" value="A1ZZFT5FULY4LN">
+
+
+
+
+<script type="text/javascript">
+P.when("A", "jQuery").execute(function(A, $) {
+$("#selectQuantity [name='quantity'], #mobileQuantityDropDown").live("change", function (event) {
+if (event.updateDDMOnQuantityChange) {
+return;
+}
+event.updateDDMOnQuantityChange = 1;
+// "#buybox" is included in this list because if there is no accordion row, then it is a single-offer layout
+var accordionRow = $(this).closest('[id$="AccordionRow"], #buybox');
+var quantity = $(this).val();
+var asin = accordionRow.find("#ddmSelectAsin").val();
+var deviceType = "web";
+if (!asin || !quantity) {
+return;
+}
+var canReload = false;
+if (typeof sbrContext !== 'undefined') {
+canReload = sbrContext.sbrBehavior && sbrContext.sbrBehavior.reloadPageWhenBBWinnerChange;
+}
+var merchantId = "";
+var preselectedMerchantId = "";
+if(canReload) {
+preselectedMerchantId = accordionRow.find("#ddmSelectPreselectedMerchant").val();
+} else {
+merchantId = accordionRow.find("#ddmSelectMerchant").val();
+}
+$.ajax({
+type: "POST",
+url: "/gp/product/features/dynamic-delivery-message/udp-ajax-handler/get-delivery-message.html?_encoding=UTF-8",
+contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+data: {
+"asin": asin,
+"deviceType": deviceType,
+"merchantId": merchantId,
+"preselectedMerchantId": preselectedMerchantId,
+"quantity": quantity
+},
+accordionRow: accordionRow,
+dataType: "html",
+success: function(objResponse) {
+if (objResponse != null && objResponse != "") {
+accordionRow.find("#dynamicDeliveryMessage").replaceWith(objResponse);
+}
+}
+});
+});
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<span class="a-size-base aod-delivery-more aok-hidden">...
+<span class="a-declarative" data-action="aod-delivery-more-action" data-aod-delivery-more-action="{}" id="aod-delivery-more-action">
+<a aria-label="Mais. sobre a entrega" class="a-link-normal aod-delivery-morelink" href="#">Mais</a>
+</span>
+</span>
+</div>
+
+
+
+
+
+
+
+</div>
+<div class="a-fixed-right-grid-col aod-atc-column a-col-right" style="width:150px;margin-right:-150px;float:left;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<form method="post" action="/gp/add-to-cart/html/ref=aod_dpdsk_new_1" class="aod-atc-form-header-desktop a-spacing-none">
+
+
+
+
+<input type="hidden" name="session-id" value="142-6330422-1678217">
+<input type="hidden" name="qid">
+<input type="hidden" name="sr">
+
+
+
+<input type="hidden" name="signInToHUC" value="0" id="signInToHUC">
+
+
+<input type="hidden" name="metric-asin.B07FCMKK5X" value="1">
+<input type="hidden" name="registryItemID.1">
+<input type="hidden" name="registryID.1">
+<input type="hidden" name="itemCount" value="1">
+
+
+<input type="hidden" name="offeringID.1" value="sNK1cg5L7qm35Rk0G0xmCX95SvlVYCtzBwr%2BvKJadZZZdQ9CPNDT7ak8fvmpo3tqeDjZe2xkaMBVwOc50Kh8zExFyyvsME4VFMilVJ0x6JUNqSs92vxf%2BG2ouE7FxbAIpSKj7CfZ15J6ll9be5NkJky7Yzzd7%2Fl5">
+<input type="hidden" name="quantity.1" value="1">
+
+<input type="hidden" name="isAddon" value="1">
+
+
+
+
+
+
+
+
+<span class="a-declarative" data-action="aod-click-log" data-aod-click-log="{&quot;subtype&quot;:&quot;main&quot;,&quot;type&quot;:&quot;addToCart&quot;}">
+<span id="a-autoid-2" class="a-button a-button-primary aod-atc-generic-btn-desktop"><span class="a-button-inner"><input name="submit.addToCart" aria-label="Adicionar ao carrinho do vendedor Amazon.com.br e preço R$164,00
+" aria-labelledby="" class="a-button-input" type="submit"><span id="a-autoid-2-announce" class="a-button-text" aria-hidden="true">
+Adicionar ao Carrinho
+</span></span></span>
+</span>
+
+
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+</div></div>
+</div>
+<div class="a-row aod-clear-float"></div>
+<hr aria-hidden="true" class="a-spacing-small a-spacing-top-small a-divider-normal aod-condition-divider">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-shipsFrom" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Enviado pela</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+
+<span class="a-size-small a-color-base">Amazon.com.br</span>
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-soldBy" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Vendido por</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+<span aria-label="Amazon.com.br. Abre uma nova página" class="a-size-small a-color-base"> Amazon.com.br </span>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br> <a class="a-size-small a-link-normal" target="_blank" rel="noopener" href="/gp/help/customer/display.html?nodeID=15015721#aag_returns" role="link">política de devoluções </a>
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="a-section aod-offer-divider aod-clear-float"></div>
+</div>
+
+
+
+<hr aria-hidden="true" class="a-spacing-none a-divider-normal aod-offer-block-divider">
+
+
+
+
+<div id="aod-offer" class="a-section a-spacing-medium a-spacing-top-base a-padding-none aod-information-block aod-clear-float">
+<div id="aod-offer-heading" class="a-section a-spacing-none a-padding-none aod-clear-float">
+
+
+
+
+
+
+
+
+
+
+
+<h5>
+
+
+Novo
+
+
+
+
+</h5>
+
+
+
+</div>
+
+
+
+<div id="aod-offer-price" class="a-section a-spacing-none a-spacing-top-micro a-padding-none aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col a-col-left" style="width:165px;margin-left:-165px;float:left;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-price-2" class="a-section a-spacing-none a-padding-none">
+<span class="a-price" data-a-size="l" data-a-color="base"><span class="a-offscreen">R$249,90</span><span aria-hidden="true"><span class="a-price-symbol">R$</span><span class="a-price-whole">249<span class="a-price-decimal">,</span></span><span class="a-price-fraction">90</span></span></span>
+</div>
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+<div class="a-fixed-right-grid"><div class="a-fixed-right-grid-inner" style="padding-right:150px">
+<div class="a-fixed-right-grid-col aod-padding-right-10 a-col-left" style="padding-right:0%;float:left;">
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-bottlingDepositFee-2" class="a-row">
+
+</div>
+
+
+
+
+
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-promotion-2" class="a-section a-spacing-none a-padding-none">
+
+
+    
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="a-row aod-ship-charge">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+<div class="a-row aod-delivery-promise">
+<div class="a-column a-span12 aod-delivery-promise-column">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="dynamicDeliveryMessage" class="a-section a-spacing-mini a-spacing-top-mini">
+
+
+
+<div id="ddmDeliveryMessage" class="a-section a-spacing-mini">
+
+
+
+
+
+
+
+
+
+R$12,03 de frete. Entrega: <b> 18 - 21 de Mai </b>
+
+
+
+
+
+
+
+
+
+
+<br>
+<div class="a-section a-spacing-top-mini">
+Entrega mais rápida: <b>
+
+
+19 - 20 de Mai
+
+</b>
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+<input type="hidden" id="ddmSelectAsin" value="B07FCMKK5X">
+
+
+<input type="hidden" id="ddmSelectMerchant" value="ARR2R76H0PWSG">
+
+
+<input type="hidden" id="ddmSelectPreselectedMerchant" value="ARR2R76H0PWSG">
+
+
+
+
+<script type="text/javascript">
+P.when("A", "jQuery").execute(function(A, $) {
+$("#selectQuantity [name='quantity'], #mobileQuantityDropDown").live("change", function (event) {
+if (event.updateDDMOnQuantityChange) {
+return;
+}
+event.updateDDMOnQuantityChange = 1;
+// "#buybox" is included in this list because if there is no accordion row, then it is a single-offer layout
+var accordionRow = $(this).closest('[id$="AccordionRow"], #buybox');
+var quantity = $(this).val();
+var asin = accordionRow.find("#ddmSelectAsin").val();
+var deviceType = "web";
+if (!asin || !quantity) {
+return;
+}
+var canReload = false;
+if (typeof sbrContext !== 'undefined') {
+canReload = sbrContext.sbrBehavior && sbrContext.sbrBehavior.reloadPageWhenBBWinnerChange;
+}
+var merchantId = "";
+var preselectedMerchantId = "";
+if(canReload) {
+preselectedMerchantId = accordionRow.find("#ddmSelectPreselectedMerchant").val();
+} else {
+merchantId = accordionRow.find("#ddmSelectMerchant").val();
+}
+$.ajax({
+type: "POST",
+url: "/gp/product/features/dynamic-delivery-message/udp-ajax-handler/get-delivery-message.html?_encoding=UTF-8",
+contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+data: {
+"asin": asin,
+"deviceType": deviceType,
+"merchantId": merchantId,
+"preselectedMerchantId": preselectedMerchantId,
+"quantity": quantity
+},
+accordionRow: accordionRow,
+dataType: "html",
+success: function(objResponse) {
+if (objResponse != null && objResponse != "") {
+accordionRow.find("#dynamicDeliveryMessage").replaceWith(objResponse);
+}
+}
+});
+});
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<span class="a-size-base aod-delivery-more aok-hidden">...
+<span class="a-declarative" data-action="aod-delivery-more-action" data-aod-delivery-more-action="{}" id="aod-delivery-more-action">
+<a aria-label="Mais. sobre a entrega" class="a-link-normal aod-delivery-morelink" href="#">Mais</a>
+</span>
+</span>
+</div>
+
+
+
+
+
+
+
+</div>
+<div class="a-fixed-right-grid-col aod-atc-column a-col-right" style="width:150px;margin-right:-150px;float:left;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<form method="post" action="/gp/add-to-cart/html/ref=aod_dpdsk_new_2" class="aod-atc-form-header-desktop a-spacing-none">
+
+
+
+
+<input type="hidden" name="session-id" value="142-6330422-1678217">
+<input type="hidden" name="qid">
+<input type="hidden" name="sr">
+
+
+
+<input type="hidden" name="signInToHUC" value="0" id="signInToHUC">
+
+
+<input type="hidden" name="metric-asin.B07FCMKK5X" value="1">
+<input type="hidden" name="registryItemID.1">
+<input type="hidden" name="registryID.1">
+<input type="hidden" name="itemCount" value="1">
+
+
+<input type="hidden" name="offeringID.1" value="83LX7ZF6hNDgLthqNZqlEzca0b2iqYZ3rm3tNbhIlDmgMeqvCCh9OYVGpbUsloDWO6fXBSPRimuDF%2BBVY3OlLrCna7Ct5E4%2Baa8KTJ4fsxut2Hsmj6pUjan7CGTFlmAGr0Oqt4DVr9D59eR7d5Ei%2Feu70a6AantN8HkTUDgp9h8LmNgaAtg8RT%2BrB5ksxTD7">
+<input type="hidden" name="quantity.1" value="1">
+
+<input type="hidden" name="isAddon" value="1">
+
+
+
+
+
+
+
+
+<span class="a-declarative" data-action="aod-click-log" data-aod-click-log="{&quot;subtype&quot;:&quot;main&quot;,&quot;type&quot;:&quot;addToCart&quot;}">
+<span id="a-autoid-2" class="a-button a-button-primary aod-atc-generic-btn-desktop"><span class="a-button-inner"><input name="submit.addToCart" aria-label="Adicionar ao carrinho do vendedor Here News e preço R$249,90
+" aria-labelledby="" class="a-button-input" type="submit"><span id="a-autoid-2-announce" class="a-button-text" aria-hidden="true">
+Adicionar ao Carrinho
+</span></span></span>
+</span>
+
+
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+</div></div>
+</div>
+<div class="a-row aod-clear-float"></div>
+<hr aria-hidden="true" class="a-spacing-small a-spacing-top-small a-divider-normal aod-condition-divider">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-shipsFrom" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Enviado pela</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+
+<span class="a-size-small a-color-base">Here News</span>
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-soldBy" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Vendido por</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+
+
+<a aria-label="Abre uma nova página" class="a-size-small a-link-normal" target="_blank" rel="noopener" href="/gp/aag/main?ie=UTF8&amp;seller=ARR2R76H0PWSG&amp;isAmazonFulfilled=0&amp;asin=B07FCMKK5X&amp;ref_=olp_merch_name_2" role="link">
+Here News</a>
+
+
+
+<div id="aod-offer-seller-rating" class="a-section a-spacing-none a-padding-none">
+
+<span id="seller-rating-count-{iter}" class="a-size-small a-color-base">
+
+<span>Recém-lançado</span>
+
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a class="a-size-small a-link-normal" target="_blank" rel="noopener" href="/gp/aag/main?ie=UTF8&amp;seller=ARR2R76H0PWSG&amp;isAmazonFulfilled=0&amp;asin=B07FCMKK5X&amp;sshmPath=returns&amp;ref_=olp_merch_name_2" role="link">política de devoluções</a>
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="a-section aod-offer-divider aod-clear-float"></div>
+</div>
+
+
+
+<hr aria-hidden="true" class="a-spacing-none a-divider-normal aod-offer-block-divider">
+
+
+
+
+<div id="aod-offer" class="a-section a-spacing-medium a-spacing-top-base a-padding-none aod-information-block aod-clear-float">
+<div id="aod-offer-heading" class="a-section a-spacing-none a-padding-none aod-clear-float">
+
+
+
+
+
+
+
+
+
+
+
+<h5>
+
+
+Novo
+
+
+
+
+</h5>
+
+
+
+</div>
+
+
+
+<div id="aod-offer-price" class="a-section a-spacing-none a-spacing-top-micro a-padding-none aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col a-col-left" style="width:165px;margin-left:-165px;float:left;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-price-3" class="a-section a-spacing-none a-padding-none">
+<span class="a-price" data-a-size="l" data-a-color="base"><span class="a-offscreen">R$290,00</span><span aria-hidden="true"><span class="a-price-symbol">R$</span><span class="a-price-whole">290<span class="a-price-decimal">,</span></span><span class="a-price-fraction">00</span></span></span>
+</div>
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+<div class="a-fixed-right-grid"><div class="a-fixed-right-grid-inner" style="padding-right:150px">
+<div class="a-fixed-right-grid-col aod-padding-right-10 a-col-left" style="padding-right:0%;float:left;">
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-bottlingDepositFee-3" class="a-row">
+
+</div>
+
+
+
+
+
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-promotion-3" class="a-section a-spacing-none a-padding-none">
+
+
+    
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="a-row aod-ship-charge">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+<div class="a-row aod-delivery-promise">
+<div class="a-column a-span12 aod-delivery-promise-column">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="dynamicDeliveryMessage" class="a-section a-spacing-mini a-spacing-top-mini">
+
+
+
+<div id="ddmDeliveryMessage" class="a-section a-spacing-mini">
+
+
+
+
+
+
+
+
+
+R$10,04 de frete. Entrega: <b> 20 - 25 de Mai </b>
+
+
+
+
+
+
+
+
+
+
+<br>
+<div class="a-section a-spacing-top-mini">
+Entrega mais rápida: <b>
+
+
+18 - 21 de Mai
+
+</b>
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+<input type="hidden" id="ddmSelectAsin" value="B07FCMKK5X">
+
+
+<input type="hidden" id="ddmSelectMerchant" value="AG9QSQKBT6OKS">
+
+
+<input type="hidden" id="ddmSelectPreselectedMerchant" value="AG9QSQKBT6OKS">
+
+
+
+
+<script type="text/javascript">
+P.when("A", "jQuery").execute(function(A, $) {
+$("#selectQuantity [name='quantity'], #mobileQuantityDropDown").live("change", function (event) {
+if (event.updateDDMOnQuantityChange) {
+return;
+}
+event.updateDDMOnQuantityChange = 1;
+// "#buybox" is included in this list because if there is no accordion row, then it is a single-offer layout
+var accordionRow = $(this).closest('[id$="AccordionRow"], #buybox');
+var quantity = $(this).val();
+var asin = accordionRow.find("#ddmSelectAsin").val();
+var deviceType = "web";
+if (!asin || !quantity) {
+return;
+}
+var canReload = false;
+if (typeof sbrContext !== 'undefined') {
+canReload = sbrContext.sbrBehavior && sbrContext.sbrBehavior.reloadPageWhenBBWinnerChange;
+}
+var merchantId = "";
+var preselectedMerchantId = "";
+if(canReload) {
+preselectedMerchantId = accordionRow.find("#ddmSelectPreselectedMerchant").val();
+} else {
+merchantId = accordionRow.find("#ddmSelectMerchant").val();
+}
+$.ajax({
+type: "POST",
+url: "/gp/product/features/dynamic-delivery-message/udp-ajax-handler/get-delivery-message.html?_encoding=UTF-8",
+contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+data: {
+"asin": asin,
+"deviceType": deviceType,
+"merchantId": merchantId,
+"preselectedMerchantId": preselectedMerchantId,
+"quantity": quantity
+},
+accordionRow: accordionRow,
+dataType: "html",
+success: function(objResponse) {
+if (objResponse != null && objResponse != "") {
+accordionRow.find("#dynamicDeliveryMessage").replaceWith(objResponse);
+}
+}
+});
+});
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<span class="a-size-base aod-delivery-more aok-hidden">...
+<span class="a-declarative" data-action="aod-delivery-more-action" data-aod-delivery-more-action="{}" id="aod-delivery-more-action">
+<a aria-label="Mais. sobre a entrega" class="a-link-normal aod-delivery-morelink" href="#">Mais</a>
+</span>
+</span>
+</div>
+
+
+
+
+
+
+
+</div>
+<div class="a-fixed-right-grid-col aod-atc-column a-col-right" style="width:150px;margin-right:-150px;float:left;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<form method="post" action="/gp/add-to-cart/html/ref=aod_dpdsk_new_3" class="aod-atc-form-header-desktop a-spacing-none">
+
+
+
+
+<input type="hidden" name="session-id" value="142-6330422-1678217">
+<input type="hidden" name="qid">
+<input type="hidden" name="sr">
+
+
+
+<input type="hidden" name="signInToHUC" value="0" id="signInToHUC">
+
+
+<input type="hidden" name="metric-asin.B07FCMKK5X" value="1">
+<input type="hidden" name="registryItemID.1">
+<input type="hidden" name="registryID.1">
+<input type="hidden" name="itemCount" value="1">
+
+
+<input type="hidden" name="offeringID.1" value="7uJtvVj%2BHTRUCt8WjdHl6Zoan4MiVQk%2FC97HNo220Hjb%2FJWjtmTYIxej52EawFERUWSeNHaaP6YXbBgxgApVchvfw3UcDzth00ueiSM%2B%2FCo6s9tnUED9mwmTD7J%2BAw9DoJJiPeOzsD50%2FSP5bhgonBLwRpOWIhwtfAKuK5DgUYiVTU64OK8kKAjA9D6K3Vf%2B">
+<input type="hidden" name="quantity.1" value="1">
+
+<input type="hidden" name="isAddon" value="1">
+
+
+
+
+
+
+
+
+<span class="a-declarative" data-action="aod-click-log" data-aod-click-log="{&quot;subtype&quot;:&quot;main&quot;,&quot;type&quot;:&quot;addToCart&quot;}">
+<span id="a-autoid-2" class="a-button a-button-primary aod-atc-generic-btn-desktop"><span class="a-button-inner"><input name="submit.addToCart" aria-label="Adicionar ao carrinho do vendedor King Technology Solution e preço R$290,00
+" aria-labelledby="" class="a-button-input" type="submit"><span id="a-autoid-2-announce" class="a-button-text" aria-hidden="true">
+Adicionar ao Carrinho
+</span></span></span>
+</span>
+
+
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+</div></div>
+</div>
+<div class="a-row aod-clear-float"></div>
+<hr aria-hidden="true" class="a-spacing-small a-spacing-top-small a-divider-normal aod-condition-divider">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-shipsFrom" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Enviado pela</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+
+<span class="a-size-small a-color-base">King Technology Solution</span>
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-soldBy" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Vendido por</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+
+
+<a aria-label="Abre uma nova página" class="a-size-small a-link-normal" target="_blank" rel="noopener" href="/gp/aag/main?ie=UTF8&amp;seller=AG9QSQKBT6OKS&amp;isAmazonFulfilled=0&amp;asin=B07FCMKK5X&amp;ref_=olp_merch_name_3" role="link">
+King Technology Solution</a>
+
+
+
+<div id="aod-offer-seller-rating" class="a-section a-spacing-none a-padding-none">
+
+<i class="a-icon a-icon-star-mini a-star-mini-4-5 aod-seller-rating-count-class"></i>
+
+<span id="seller-rating-count-{iter}" class="a-size-small a-color-base">
+
+<span>(140 classificações)<br>88% positivo nos últimos 12 meses</span>
+
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a class="a-size-small a-link-normal" target="_blank" rel="noopener" href="/gp/aag/main?ie=UTF8&amp;seller=AG9QSQKBT6OKS&amp;isAmazonFulfilled=0&amp;asin=B07FCMKK5X&amp;sshmPath=returns&amp;ref_=olp_merch_name_3" role="link">política de devoluções</a>
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="a-section aod-offer-divider aod-clear-float"></div>
+</div>
+
+
+
+<hr aria-hidden="true" class="a-spacing-none a-divider-normal aod-offer-block-divider">
+
+
+
+
+<div id="aod-offer" class="a-section a-spacing-medium a-spacing-top-base a-padding-none aod-information-block aod-clear-float">
+<div id="aod-offer-heading" class="a-section a-spacing-none a-padding-none aod-clear-float">
+
+
+
+
+
+
+
+
+
+
+
+<h5>
+
+
+Novo
+
+
+
+
+</h5>
+
+
+
+</div>
+
+
+
+<div id="aod-offer-price" class="a-section a-spacing-none a-spacing-top-micro a-padding-none aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col a-col-left" style="width:165px;margin-left:-165px;float:left;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-price-4" class="a-section a-spacing-none a-padding-none">
+<span class="a-price" data-a-size="l" data-a-color="base"><span class="a-offscreen">R$279,11</span><span aria-hidden="true"><span class="a-price-symbol">R$</span><span class="a-price-whole">279<span class="a-price-decimal">,</span></span><span class="a-price-fraction">11</span></span></span>
+</div>
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+<div class="a-fixed-right-grid"><div class="a-fixed-right-grid-inner" style="padding-right:150px">
+<div class="a-fixed-right-grid-col aod-padding-right-10 a-col-left" style="padding-right:0%;float:left;">
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-bottlingDepositFee-4" class="a-row">
+
+</div>
+
+
+
+
+
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-promotion-4" class="a-section a-spacing-none a-padding-none">
+
+
+    
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="a-row aod-ship-charge">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+<div class="a-row aod-delivery-promise">
+<div class="a-column a-span12 aod-delivery-promise-column">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="dynamicDeliveryMessage" class="a-section a-spacing-mini a-spacing-top-mini">
+
+
+
+<div id="ddmDeliveryMessage" class="a-section a-spacing-mini">
+
+
+
+
+
+
+
+
+
+R$20,96 de frete. Entrega: <b> 18 - 21 de Mai </b>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+<input type="hidden" id="ddmSelectAsin" value="B07FCMKK5X">
+
+
+<input type="hidden" id="ddmSelectMerchant" value="A1N5VGEGCB0T8U">
+
+
+<input type="hidden" id="ddmSelectPreselectedMerchant" value="A1N5VGEGCB0T8U">
+
+
+
+
+<script type="text/javascript">
+P.when("A", "jQuery").execute(function(A, $) {
+$("#selectQuantity [name='quantity'], #mobileQuantityDropDown").live("change", function (event) {
+if (event.updateDDMOnQuantityChange) {
+return;
+}
+event.updateDDMOnQuantityChange = 1;
+// "#buybox" is included in this list because if there is no accordion row, then it is a single-offer layout
+var accordionRow = $(this).closest('[id$="AccordionRow"], #buybox');
+var quantity = $(this).val();
+var asin = accordionRow.find("#ddmSelectAsin").val();
+var deviceType = "web";
+if (!asin || !quantity) {
+return;
+}
+var canReload = false;
+if (typeof sbrContext !== 'undefined') {
+canReload = sbrContext.sbrBehavior && sbrContext.sbrBehavior.reloadPageWhenBBWinnerChange;
+}
+var merchantId = "";
+var preselectedMerchantId = "";
+if(canReload) {
+preselectedMerchantId = accordionRow.find("#ddmSelectPreselectedMerchant").val();
+} else {
+merchantId = accordionRow.find("#ddmSelectMerchant").val();
+}
+$.ajax({
+type: "POST",
+url: "/gp/product/features/dynamic-delivery-message/udp-ajax-handler/get-delivery-message.html?_encoding=UTF-8",
+contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+data: {
+"asin": asin,
+"deviceType": deviceType,
+"merchantId": merchantId,
+"preselectedMerchantId": preselectedMerchantId,
+"quantity": quantity
+},
+accordionRow: accordionRow,
+dataType: "html",
+success: function(objResponse) {
+if (objResponse != null && objResponse != "") {
+accordionRow.find("#dynamicDeliveryMessage").replaceWith(objResponse);
+}
+}
+});
+});
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<span class="a-size-base aod-delivery-more aok-hidden">...
+<span class="a-declarative" data-action="aod-delivery-more-action" data-aod-delivery-more-action="{}" id="aod-delivery-more-action">
+<a aria-label="Mais. sobre a entrega" class="a-link-normal aod-delivery-morelink" href="#">Mais</a>
+</span>
+</span>
+</div>
+
+
+
+
+
+
+
+</div>
+<div class="a-fixed-right-grid-col aod-atc-column a-col-right" style="width:150px;margin-right:-150px;float:left;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<form method="post" action="/gp/add-to-cart/html/ref=aod_dpdsk_new_4" class="aod-atc-form-header-desktop a-spacing-none">
+
+
+
+
+<input type="hidden" name="session-id" value="142-6330422-1678217">
+<input type="hidden" name="qid">
+<input type="hidden" name="sr">
+
+
+
+<input type="hidden" name="signInToHUC" value="0" id="signInToHUC">
+
+
+<input type="hidden" name="metric-asin.B07FCMKK5X" value="1">
+<input type="hidden" name="registryItemID.1">
+<input type="hidden" name="registryID.1">
+<input type="hidden" name="itemCount" value="1">
+
+
+<input type="hidden" name="offeringID.1" value="HZZCcPFUN2lR4PUAriQ%2BMAonDX7YuD%2BflqGh%2F49IXIAmK8o4YFn3d5ZkpnycuoC9ks%2Fa1eqKiuyXm6JbSJsyWPpnGLH977tULfy1CaiyEAcJVzpVsGCaxidhH0c8aqIZOF58%2FWV6eqEviRW8pD%2FQTGzqh5t%2B5L6JFbZ6zhPVPQfBq2DJFlfipedp7TOdEw9E">
+<input type="hidden" name="quantity.1" value="1">
+
+<input type="hidden" name="isAddon" value="1">
+
+
+
+
+
+
+
+
+<span class="a-declarative" data-action="aod-click-log" data-aod-click-log="{&quot;subtype&quot;:&quot;main&quot;,&quot;type&quot;:&quot;addToCart&quot;}">
+<span id="a-autoid-2" class="a-button a-button-primary aod-atc-generic-btn-desktop"><span class="a-button-inner"><input name="submit.addToCart" aria-label="Adicionar ao carrinho do vendedor EIYO e preço R$279,11
+" aria-labelledby="" class="a-button-input" type="submit"><span id="a-autoid-2-announce" class="a-button-text" aria-hidden="true">
+Adicionar ao Carrinho
+</span></span></span>
+</span>
+
+
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+</div></div>
+</div>
+<div class="a-row aod-clear-float"></div>
+<hr aria-hidden="true" class="a-spacing-small a-spacing-top-small a-divider-normal aod-condition-divider">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-shipsFrom" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Enviado pela</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+
+<span class="a-size-small a-color-base">EIYO</span>
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-soldBy" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Vendido por</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+
+
+<a aria-label="Abre uma nova página" class="a-size-small a-link-normal" target="_blank" rel="noopener" href="/gp/aag/main?ie=UTF8&amp;seller=A1N5VGEGCB0T8U&amp;isAmazonFulfilled=0&amp;asin=B07FCMKK5X&amp;ref_=olp_merch_name_4" role="link">
+EIYO</a>
+
+
+
+<div id="aod-offer-seller-rating" class="a-section a-spacing-none a-padding-none">
+
+<i class="a-icon a-icon-star-mini a-star-mini-2-5 aod-seller-rating-count-class"></i>
+
+<span id="seller-rating-count-{iter}" class="a-size-small a-color-base">
+
+<span>(24 classificações)<br>36% positivo nos últimos 12 meses</span>
+
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a class="a-size-small a-link-normal" target="_blank" rel="noopener" href="/gp/aag/main?ie=UTF8&amp;seller=A1N5VGEGCB0T8U&amp;isAmazonFulfilled=0&amp;asin=B07FCMKK5X&amp;sshmPath=returns&amp;ref_=olp_merch_name_4" role="link">política de devoluções</a>
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="a-section aod-offer-divider aod-clear-float"></div>
+</div>
+
+
+
+<hr aria-hidden="true" class="a-spacing-none a-divider-normal aod-offer-block-divider">
+
+
+
+
+<div id="aod-offer" class="a-section a-spacing-medium a-spacing-top-base a-padding-none aod-information-block aod-clear-float">
+<div id="aod-offer-heading" class="a-section a-spacing-none a-padding-none aod-clear-float">
+
+
+
+
+
+
+
+
+
+
+
+<h5>
+
+
+Novo
+
+
+
+
+</h5>
+
+
+
+</div>
+
+
+
+<div id="aod-offer-price" class="a-section a-spacing-none a-spacing-top-micro a-padding-none aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col a-col-left" style="width:165px;margin-left:-165px;float:left;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-price-5" class="a-section a-spacing-none a-padding-none">
+<span class="a-price" data-a-size="l" data-a-color="base"><span class="a-offscreen">R$319,90</span><span aria-hidden="true"><span class="a-price-symbol">R$</span><span class="a-price-whole">319<span class="a-price-decimal">,</span></span><span class="a-price-fraction">90</span></span></span>
+</div>
+
+
+
+
+
+
+
+
+
+
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+<div class="a-fixed-right-grid"><div class="a-fixed-right-grid-inner" style="padding-right:150px">
+<div class="a-fixed-right-grid-col aod-padding-right-10 a-col-left" style="padding-right:0%;float:left;">
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-bottlingDepositFee-5" class="a-row">
+
+</div>
+
+
+
+
+
+<div class="a-row">
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-promotion-5" class="a-section a-spacing-none a-padding-none">
+
+
+    
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="a-row aod-ship-charge">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+<div class="a-row aod-delivery-promise">
+<div class="a-column a-span12 aod-delivery-promise-column">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="dynamicDeliveryMessage" class="a-section a-spacing-mini a-spacing-top-mini">
+
+
+
+<div id="ddmDeliveryMessage" class="a-section a-spacing-mini">
+
+
+
+
+
+
+
+
+
+
+    
+    <a href="/gp/help/customer/display.html?ie=UTF8&amp;pop-up=1&amp;nodeId=201365600" target="AmazonHelp" onclick="return amz_js_PopWin(this.href,'AmazonHelp','width=550,height=550,resizable=1,scrollbars=1,toolbar=0,status=0');">Entrega com Frete GRÁTIS:</a> <b>
+
+Segunda-feira, 24 de Mai
+</b>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+<div class="a-section a-spacing-top-mini">
+Entrega mais rápida: <b>
+
+Quinta-feira, 20 de Mai
+</b>
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+<input type="hidden" id="ddmSelectAsin" value="B07FCMKK5X">
+
+
+<input type="hidden" id="ddmSelectMerchant" value="A31UCEGPN84ZF4">
+
+
+<input type="hidden" id="ddmSelectPreselectedMerchant" value="A31UCEGPN84ZF4">
+
+
+
+
+<script type="text/javascript">
+P.when("A", "jQuery").execute(function(A, $) {
+$("#selectQuantity [name='quantity'], #mobileQuantityDropDown").live("change", function (event) {
+if (event.updateDDMOnQuantityChange) {
+return;
+}
+event.updateDDMOnQuantityChange = 1;
+// "#buybox" is included in this list because if there is no accordion row, then it is a single-offer layout
+var accordionRow = $(this).closest('[id$="AccordionRow"], #buybox');
+var quantity = $(this).val();
+var asin = accordionRow.find("#ddmSelectAsin").val();
+var deviceType = "web";
+if (!asin || !quantity) {
+return;
+}
+var canReload = false;
+if (typeof sbrContext !== 'undefined') {
+canReload = sbrContext.sbrBehavior && sbrContext.sbrBehavior.reloadPageWhenBBWinnerChange;
+}
+var merchantId = "";
+var preselectedMerchantId = "";
+if(canReload) {
+preselectedMerchantId = accordionRow.find("#ddmSelectPreselectedMerchant").val();
+} else {
+merchantId = accordionRow.find("#ddmSelectMerchant").val();
+}
+$.ajax({
+type: "POST",
+url: "/gp/product/features/dynamic-delivery-message/udp-ajax-handler/get-delivery-message.html?_encoding=UTF-8",
+contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+data: {
+"asin": asin,
+"deviceType": deviceType,
+"merchantId": merchantId,
+"preselectedMerchantId": preselectedMerchantId,
+"quantity": quantity
+},
+accordionRow: accordionRow,
+dataType: "html",
+success: function(objResponse) {
+if (objResponse != null && objResponse != "") {
+accordionRow.find("#dynamicDeliveryMessage").replaceWith(objResponse);
+}
+}
+});
+});
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+<span class="a-size-base aod-delivery-more aok-hidden">...
+<span class="a-declarative" data-action="aod-delivery-more-action" data-aod-delivery-more-action="{}" id="aod-delivery-more-action">
+<a aria-label="Mais. sobre a entrega" class="a-link-normal aod-delivery-morelink" href="#">Mais</a>
+</span>
+</span>
+</div>
+
+
+
+
+
+
+
+</div>
+<div class="a-fixed-right-grid-col aod-atc-column a-col-right" style="width:150px;margin-right:-150px;float:left;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<form method="post" action="/gp/add-to-cart/html/ref=aod_dpdsk_new_5" class="aod-atc-form-header-desktop a-spacing-none">
+
+
+
+
+<input type="hidden" name="session-id" value="142-6330422-1678217">
+<input type="hidden" name="qid">
+<input type="hidden" name="sr">
+
+
+
+<input type="hidden" name="signInToHUC" value="0" id="signInToHUC">
+
+
+<input type="hidden" name="metric-asin.B07FCMKK5X" value="1">
+<input type="hidden" name="registryItemID.1">
+<input type="hidden" name="registryID.1">
+<input type="hidden" name="itemCount" value="1">
+
+
+<input type="hidden" name="offeringID.1" value="7uJtvVj%2BHTRUCt8WjdHl6Zoan4MiVQk%2FBBtt%2FQt%2B5yR7EkTeY1sWjknbe6OsnM8mcBvATfxeo3xLPcnrzuZbIrAM6a4iuVrQ9S8NmRrT8fBwX4BksyeeITMox7Ecm3ubiYyIMt7jE0XmI6oAvzwILH3G05MqJxahtKNfUEY5OmOuqX%2FwG8uwqmKz8GbGpHxO">
+<input type="hidden" name="quantity.1" value="1">
+
+<input type="hidden" name="isAddon" value="1">
+
+
+
+
+
+
+
+
+<span class="a-declarative" data-action="aod-click-log" data-aod-click-log="{&quot;subtype&quot;:&quot;main&quot;,&quot;type&quot;:&quot;addToCart&quot;}">
+<span id="a-autoid-2" class="a-button a-button-primary aod-atc-generic-btn-desktop"><span class="a-button-inner"><input name="submit.addToCart" aria-label="Adicionar ao carrinho do vendedor Digital 70 e preço R$319,90
+" aria-labelledby="" class="a-button-input" type="submit"><span id="a-autoid-2-announce" class="a-button-text" aria-hidden="true">
+Adicionar ao Carrinho
+</span></span></span>
+</span>
+
+
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+</div></div>
+</div>
+<div class="a-row aod-clear-float"></div>
+<hr aria-hidden="true" class="a-spacing-small a-spacing-top-small a-divider-normal aod-condition-divider">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-shipsFrom" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Enviado pela</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+<span class="a-size-small a-color-base"> Amazon</span>
+
+
+
+
+
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="aod-offer-soldBy" class="a-section a-spacing-none a-spacing-top-micro aod-clear-float">
+<div class="a-fixed-left-grid"><div class="a-fixed-left-grid-inner" style="padding-left:165px">
+<div class="a-fixed-left-grid-col aod-padding-right-10 a-col-left" style="width:165px;margin-left:-165px;float:left;">
+<span class="a-size-small a-color-tertiary">Vendido por</span>
+</div>
+<div class="a-fixed-left-grid-col a-col-right" style="padding-left:0%;float:left;">
+
+
+
+
+<a aria-label="Abre uma nova página" class="a-size-small a-link-normal" target="_blank" rel="noopener" href="/gp/aag/main?ie=UTF8&amp;seller=A31UCEGPN84ZF4&amp;isAmazonFulfilled=1&amp;asin=B07FCMKK5X&amp;ref_=olp_merch_name_5" role="link">
+Digital 70</a>
+
+
+
+<div id="aod-offer-seller-rating" class="a-section a-spacing-none a-padding-none">
+
+<i class="a-icon a-icon-star-mini a-star-mini-4-5 aod-seller-rating-count-class"></i>
+
+<span id="seller-rating-count-{iter}" class="a-size-small a-color-base">
+
+<span>(373 classificações)<br>93% positivo nos últimos 12 meses</span>
+
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a class="a-size-small a-link-normal" target="_blank" rel="noopener" href="/gp/aag/main?ie=UTF8&amp;seller=A31UCEGPN84ZF4&amp;isAmazonFulfilled=1&amp;asin=B07FCMKK5X&amp;sshmPath=returns&amp;ref_=olp_merch_name_5" role="link">política de devoluções</a>
+
+
+
+
+
+</div>
+</div></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="a-section aod-offer-divider aod-clear-float"></div>
+</div>
+
+
+
+<hr aria-hidden="true" class="a-spacing-none a-divider-normal aod-offer-block-divider">
+
+
+
+</div>
+
+<div id="aod-footer" class="a-section a-spacing-none aod-hide">
+<span class="a-declarative" data-action="aod-load-offers" data-aod-load-offers="{}">
+<a id="aod-show-more-offers" aria-label="Veja mais. Opções" class="a-link-normal aod-hide" title="Show more" href="#">
+<i class="a-icon a-icon-arrow-up a-icon-mini aod-arrow-low" role="img" aria-label="Veja mais. Opções"></i>
+Ver mais
+</a>
+</span>
+<span id="aod-end-of-results" class="a-size-base a-color-base aod-hide">
+Fim dos resultados
+</span>
+<div id="aod-footer-spinner-container" class="a-section a-spacing-none a-padding-none">
+<span id="aod-offer-load-spinner" class="a-spinner a-spinner-small aod-hide"></span>
+</div>
+</div>
+
+
+</div>
+</div>
+</span>
+</span>
+</span>
+
+
+
+
+
+
+</body></html>

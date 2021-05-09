@@ -460,15 +460,16 @@ func (b *bot) log(obj interface{}) {
 }
 
 func textMessage(i api.Item, state int, chat string) string {
+	coin := api.Coin(i.Domain)
 	bottom := ""
 	if strings.HasPrefix(chat, "@") {
 		bottom = fmt.Sprintf("\n\n📣 Más anuncios en %s", chat)
 	}
 	if state == 0 {
-		return fmt.Sprintf("⚡️ BAJADA DE PRECIO\n\n%s\n\n✅ Precio: %.2f€\n🚫 Anterior: %.2f€\n\n🔗 %s%s",
-			i.Title, i.Prices[0], i.MinPrice, i.Link, bottom)
+		return fmt.Sprintf("⚡️ BAJADA DE PRECIO\n\n%s\n\n✅ Precio: %.2f%s\n🚫 Anterior: %.2f%s\n\n🔗 %s%s",
+			i.Title, i.Prices[0], coin, i.MinPrice, coin, i.Link, bottom)
 	}
 
-	return fmt.Sprintf("♻️ REACONDICIONADO\n\n%s\n\n✅ Precio: %.2f€\n🚫 Nuevo: %.2f€\n🎁 Estado: %s\n\n🔗 %s%s",
-		i.Title, i.Prices[state], i.MinPrice, api.StateText("es", state), i.Link, bottom)
+	return fmt.Sprintf("♻️ REACONDICIONADO\n\n%s\n\n✅ Precio: %.2f%s\n🚫 Nuevo: %.2f%s\n🎁 Estado: %s\n\n🔗 %s%s",
+		i.Title, i.Prices[state], coin, i.MinPrice, coin, api.StateText("es", state), i.Link, bottom)
 }

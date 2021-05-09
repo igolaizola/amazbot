@@ -24,6 +24,7 @@ import (
 
 type Item struct {
 	ID       string     `json:"id"`
+	Domain   string     `json:"domain"`
 	Link     string     `json:"link"`
 	Title    string     `json:"title"`
 	MinPrice float64    `json:"min_price"`
@@ -35,6 +36,7 @@ type Client struct {
 	ctx        context.Context
 	captchaURL string
 	transport  *transport
+	started    map[string]struct{}
 }
 
 func New(ctx context.Context, captchaURL, proxyURL string) (*Client, error) {
@@ -57,9 +59,7 @@ func New(ctx context.Context, captchaURL, proxyURL string) (*Client, error) {
 		},
 		captchaURL: captchaURL,
 		transport:  tr,
-	}
-	if err := cli.reset(); err != nil {
-		return nil, err
+		started:    make(map[string]struct{}),
 	}
 	// test captcha resolver
 	if captchaURL != "" {
@@ -90,49 +90,45 @@ func ItemID(link string) (string, bool) {
 	if err != nil {
 		return "", false
 	}
-	if !strings.Contains(u.Host, "amazon.es") {
+	idx = strings.Index(u.Host, "amazon.")
+	if idx < 0 {
 		return "", false
 	}
+	domain := u.Host[idx+len("amazon."):]
 	split := strings.Split(u.Path, "/")
+	var id string
 	var prev string
 	for _, s := range split {
 		if prev == "dp" {
-			return s, true
+			id = s
+			break
 		}
 		prev = s
 	}
-	return "", false
+	if id == "" {
+		return "", false
+	}
+	return fmt.Sprintf("%s.%s", id, domain), true
 }
 
 func Link(id string) string {
-	return fmt.Sprintf("https://www.amazon.es/dp/%s", id)
-}
-
-func StateText(lang string, s int) string {
-	mp := map[string][]string{
-		"es": {"Nuevo", "Como nuevo", "Muy bueno", "Aceptable"},
-		"en": {"New", "Like new", "Very good", "Good", "Acceptable"},
+	id, domain, _, err := parseID(id)
+	if err != nil {
+		return fmt.Sprintf("https://www.amazon.com/dp/%s", id)
 	}
-	arr, ok := mp[lang]
-	if !ok {
-		return ""
-	}
-	if s < 0 || s >= len(arr) {
-		return ""
-	}
-	return arr[s]
+	return fmt.Sprintf("https://www.amazon.%s/dp/%s", domain, id)
 }
 
 func (c *Client) Search(id string, item *Item, callback func(Item, int) error) error {
-	split := strings.SplitN(id, "?", 2)
-	maxState := 4
-	if len(split) > 1 {
-		id = split[0]
-		var err error
-		maxState, err = strconv.Atoi(split[1])
-		if err != nil {
-			return fmt.Errorf("api: couldn't parse max state: %s", split[1])
+	id, domain, maxState, err := parseID(id)
+	if err != nil {
+		return err
+	}
+	if _, ok := c.started[domain]; !ok {
+		if err := c.reset(domain); err != nil {
+			return err
 		}
+		c.started[domain] = struct{}{}
 	}
 	var retry bool
 	for {
@@ -141,13 +137,13 @@ func (c *Client) Search(id string, item *Item, callback func(Item, int) error) e
 			return nil
 		default:
 		}
-		err := c.search(id, maxState, item, callback)
+		err := c.search(id, domain, maxState, item, callback)
 		var netErr net.Error
 		if errors.As(err, &netErr) && netErr.Timeout() {
 			continue
 		}
 		if errors.Is(err, errRetry) {
-			c.reset()
+			c.reset(domain)
 			if retry {
 				return err
 			}
@@ -160,11 +156,11 @@ func (c *Client) Search(id string, item *Item, callback func(Item, int) error) e
 
 var errRetry = errors.New("retriable error")
 
-func (c *Client) search(id string, maxState int, item *Item, callback func(Item, int) error) error {
+func (c *Client) search(id, domain string, maxState int, item *Item, callback func(Item, int) error) error {
 	if item == nil {
 		return fmt.Errorf("api: item is nil")
 	}
-	u := fmt.Sprintf("https://www.amazon.es/dp/%s", id)
+	u := fmt.Sprintf("https://www.amazon.%s/dp/%s", domain, id)
 	doc, err := c.getDoc(u, id, 0)
 	if err != nil {
 		return err
@@ -179,7 +175,7 @@ func (c *Client) search(id string, maxState int, item *Item, callback func(Item,
 	if title == "" {
 		h, _ := doc.Html()
 		ioutil.WriteFile(fmt.Sprintf("%s_err.html", id), []byte(h), 0644)
-		return fmt.Errorf("api: title not found: %s", id)
+		return fmt.Errorf("api: title not found: %s.%s", id, domain)
 	}
 
 	// search link
@@ -193,14 +189,17 @@ func (c *Client) search(id string, maxState int, item *Item, callback func(Item,
 		return false
 	})
 	if link == "" {
-		return fmt.Errorf("api: link not found: %s", id)
+		return fmt.Errorf("api: link not found: %s.%s", id, domain)
 	}
 
 	var prices [5]float64
 	var sha [32]byte
 	i := 0
 	for {
-		u = fmt.Sprintf("https://www.amazon.es/gp/aod/ajax/ref=aod_page_2?asin=%s&pc=dp&pageno=%d", id, i)
+		u = fmt.Sprintf("https://www.amazon.%s/gp/aod/ajax/ref=aod_page_2?asin=%s&pc=dp&pageno=%d", domain, id, i)
+		if domain == "co.jp" || domain == "com" {
+			u = fmt.Sprintf("%s&language=en_US", u)
+		}
 		doc, err := c.getDoc(u, id, 0)
 		if err != nil {
 			return err
@@ -214,75 +213,7 @@ func (c *Client) search(id string, maxState int, item *Item, callback func(Item,
 			break
 		}
 		i++
-
-		divs := [][2]string{
-			// First pinned offer
-			{"#pinned-de-id", "#pinned-offer-top-id"},
-			// Other offers
-			{"#aod-offer", "#aod-offer-price"},
-		}
-		for _, div := range divs {
-			doc.Find(div[0]).Each(func(i int, s *goquery.Selection) {
-				state := -1
-				s.Find(fmt.Sprintf("%s #aod-offer-heading", div[0])).EachWithBreak(func(i int, s *goquery.Selection) bool {
-					text := s.Text()
-					text = strings.TrimSpace(text)
-					text = strings.Replace(text, "De 2ª mano", "", 1)
-					text = strings.Replace(text, "-", "", 1)
-					text = strings.TrimSpace(text)
-					switch text {
-					case "Nuevo":
-						state = 0
-					case "Como nuevo":
-						state = 1
-					case "Muy bueno":
-						state = 2
-					case "Bueno":
-						state = 3
-					case "Aceptable":
-						state = 4
-					}
-					return false
-				})
-				if state < 0 {
-					return
-				}
-				var delivery float64
-				s.Find(fmt.Sprintf("%s %s #ddmDeliveryMessage", div[0], div[1])).EachWithBreak(func(i int, s *goquery.Selection) bool {
-					text := s.Text()
-					text = strings.TrimSpace(text)
-					if !strings.HasPrefix(text, "Por ") {
-						return true
-					}
-					idx := strings.Index(text, "€")
-					if idx < 4 {
-						return true
-					}
-					text = text[4:idx]
-					price, err := parsePrice(text)
-					if err != nil {
-						log.Println(fmt.Errorf("api: couldn't parse delivery price %s %s: %w", text, id, err))
-						return true
-					}
-					delivery = price
-					return false
-				})
-				s.Find(fmt.Sprintf("%s %s .a-offscreen", div[0], div[1])).EachWithBreak(func(i int, s *goquery.Selection) bool {
-					text := s.Text()
-					price, err := parsePrice(text)
-					if err != nil {
-						log.Println(fmt.Errorf("api: couldn't parse price %s %s: %w", text, id, err))
-						return true
-					}
-					price = price + delivery
-					if prices[state] == 0 || price < prices[state] {
-						prices[state] = price
-					}
-					return false
-				})
-			})
-		}
-
+		prices = extractPrices(domain, id, doc, prices)
 	}
 
 	found := false
@@ -296,13 +227,14 @@ func (c *Client) search(id string, maxState int, item *Item, callback func(Item,
 
 	if !found {
 		h, _ := doc.Html()
-		ioutil.WriteFile(fmt.Sprintf("%s_err.html", id), []byte(h), 0644)
-		return fmt.Errorf("api: prices not found: %s", id)
+		ioutil.WriteFile(fmt.Sprintf("err_%s.%s.html", id, domain), []byte(h), 0644)
+		return fmt.Errorf("api: prices not found: %s.%s", id, domain)
 	}
 
 	log.Println("prices", prices)
 
 	item.ID = id
+	item.Domain = domain
 	item.Link = link
 	item.Title = title
 	prevMin := item.MinPrice
@@ -331,7 +263,7 @@ func (c *Client) search(id string, maxState int, item *Item, callback func(Item,
 		}
 		// Skip new price if not a new min
 		if i == 0 && !newMin {
-		  continue
+			continue
 		}
 		// Skip prices higher than previous ones
 		if prev[i] > 0 && p >= prev[i] {
@@ -347,6 +279,70 @@ func (c *Client) search(id string, maxState int, item *Item, callback func(Item,
 	}
 
 	return nil
+}
+
+func extractPrices(domain, id string, doc *goquery.Document, prices [5]float64) [5]float64 {
+	divs := [][2]string{
+		// First pinned offer
+		{"#pinned-de-id", "#pinned-offer-top-id"},
+		// Other offers
+		{"#aod-offer", "#aod-offer-price"},
+	}
+	for _, div := range divs {
+		doc.Find(div[0]).Each(func(i int, s *goquery.Selection) {
+			state := -1
+			s.Find(fmt.Sprintf("%s #aod-offer-heading", div[0])).EachWithBreak(func(i int, s *goquery.Selection) bool {
+				text := s.Text()
+				text = strings.TrimSpace(text)
+				text = strings.Replace(text, usedText(domain), "", 1)
+				text = strings.Replace(text, "-", "", 1)
+				text = strings.TrimSpace(text)
+				switch text {
+				case StateText(domain, 0):
+					state = 0
+				case StateText(domain, 1):
+					state = 1
+				case StateText(domain, 2):
+					state = 2
+				case StateText(domain, 3):
+					state = 3
+				case StateText(domain, 4):
+					state = 4
+				}
+				return false
+			})
+			if state < 0 {
+				return
+			}
+			var delivery float64
+			for _, deliveryDiv := range []string{"#ddmDeliveryMessage", "span.a-color-secondary.a-size-base"} {
+				s.Find(fmt.Sprintf("%s %s %s", div[0], div[1], deliveryDiv)).EachWithBreak(func(i int, s *goquery.Selection) bool {
+					text := s.Text()
+					text = strings.TrimSpace(text)
+					price, err := parsePrice(domain, text)
+					if err != nil {
+						return true
+					}
+					delivery = price
+					return false
+				})
+			}
+			s.Find(fmt.Sprintf("%s %s .a-offscreen", div[0], div[1])).EachWithBreak(func(i int, s *goquery.Selection) bool {
+				text := s.Text()
+				price, err := parsePrice(domain, text)
+				if err != nil {
+					log.Println(fmt.Errorf("api: couldn't parse price %s %s.%s: %w", text, id, domain, err))
+					return true
+				}
+				price = price + delivery
+				if prices[state] == 0 || price < prices[state] {
+					prices[state] = price
+				}
+				return false
+			})
+		})
+	}
+	return prices
 }
 
 func (c *Client) getDoc(u string, id string, depth int) (*goquery.Document, error) {
@@ -443,6 +439,26 @@ func (c *Client) getDocWithReq(req *http.Request, id string, depth int) (*goquer
 	return doc, nil
 }
 
+func parseID(id string) (string, string, int, error) {
+	split := strings.SplitN(id, ".", 2)
+	if len(split) != 2 {
+		return "", "", 0, fmt.Errorf("api: invalid id: %s", id)
+	}
+	id = split[0]
+	ext := split[1]
+	split = strings.SplitN(ext, "?", 2)
+	maxState := 4
+	if len(split) > 1 {
+		ext = split[0]
+		var err error
+		maxState, err = strconv.Atoi(split[1])
+		if err != nil {
+			return "", "", 0, fmt.Errorf("api: couldn't parse max state: %s", split[1])
+		}
+	}
+	return id, ext, maxState, nil
+}
+
 func (c *Client) resolveCaptcha(link string) (string, error) {
 	if c.captchaURL == "" {
 		return "", errors.New("api:missing captcha service")
@@ -470,14 +486,14 @@ func (c *Client) resolveCaptcha(link string) (string, error) {
 	return captcha, nil
 }
 
-func (c *Client) reset() error {
+func (c *Client) reset(domain string) error {
 	c.transport.userAgent = randomUserAgent()
 	cookieJar, err := cookiejar.New(nil)
 	if err != nil {
 		return fmt.Errorf("api: could not create cookie jar: %w", err)
 	}
 	c.client.Jar = cookieJar
-	u := "https://www.amazon.es"
+	u := fmt.Sprintf("https://www.amazon.%s", domain)
 	doc, err := c.getDoc(u, "", 0)
 	if err != nil {
 		return err
@@ -492,7 +508,7 @@ func (c *Client) reset() error {
 		return false
 	})
 	if !hasLocation {
-		if err := c.changeLocation(doc, postalCode); err != nil {
+		if err := c.changeLocation(domain, doc, postalCode); err != nil {
 			return err
 		}
 	}
@@ -500,7 +516,7 @@ func (c *Client) reset() error {
 	return nil
 }
 
-func (c *Client) changeLocation(doc *goquery.Document, postalCode string) error {
+func (c *Client) changeLocation(domain string, doc *goquery.Document, postalCode string) error {
 	modal := locationModal{}
 	doc.Find("#nav-global-location-data-modal-action").EachWithBreak(func(i int, s *goquery.Selection) bool {
 		data, ok := s.Attr("data-a-modal")
@@ -517,7 +533,7 @@ func (c *Client) changeLocation(doc *goquery.Document, postalCode string) error 
 		return fmt.Errorf("api: couldn't find location modal")
 	}
 
-	u := fmt.Sprintf("https://www.amazon.es/%s", strings.TrimLeft(modal.URL, "/"))
+	u := fmt.Sprintf("https://www.amazon.%s/%s", domain, strings.TrimLeft(modal.URL, "/"))
 	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
 		return fmt.Errorf("api: couldn't create post request: %w", err)
@@ -546,10 +562,16 @@ func (c *Client) changeLocation(doc *goquery.Document, postalCode string) error 
 		return true
 	})
 
-	u = "https://www.amazon.es/gp/delivery/ajax/address-change.html"
+	u = fmt.Sprintf("https://www.amazon.%s/gp/delivery/ajax/address-change.html", domain)
 	form := url.Values{}
-	form.Add("locationType", "LOCATION_INPUT")
-	form.Add("zipCode", postalCode)
+	if domain == "es" {
+		form.Add("locationType", "LOCATION_INPUT")
+		form.Add("zipCode", postalCode)
+	} else {
+		form.Add("locationType", "COUNTRY")
+		form.Add("district", "ES")
+		form.Add("countryCode", "ES")
+	}
 	form.Add("storeContext", "generic")
 	form.Add("deviceType", "web")
 	form.Add("pageType", "Gateway")
@@ -575,19 +597,6 @@ type locationModal struct {
 
 type ajaxHeaders struct {
 	Token string `json:"anti-csrftoken-a2z"`
-}
-
-func parsePrice(text string) (float64, error) {
-	text = strings.TrimSpace(text)
-	text = strings.Trim(text, "€$")
-	text = strings.TrimSpace(text)
-	text = strings.Replace(text, ".", "", -1)
-	text = strings.Replace(text, ",", ".", 1)
-	price, err := strconv.ParseFloat(text, 32)
-	if err != nil {
-		return 0, err
-	}
-	return price, nil
 }
 
 func newTransport(ctx context.Context, proxyURL string) (*transport, error) {
