@@ -228,7 +228,8 @@ func (c *Client) search(id, domain string, maxState int, item *Item, callback fu
 	if !found {
 		h, _ := doc.Html()
 		ioutil.WriteFile(fmt.Sprintf("err_%s.%s.html", id, domain), []byte(h), 0644)
-		return fmt.Errorf("api: prices not found: %s.%s", id, domain)
+		log.Println(fmt.Sprintf("api: prices not found: %s.%s", id, domain))
+		return nil
 	}
 
 	log.Println("prices", prices)
